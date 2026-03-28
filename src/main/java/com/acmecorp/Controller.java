@@ -4,11 +4,11 @@ import java.util.Collection;
 
 public abstract class Controller {
 
-    protected TextUserInterface textUserInterface;
+    protected View view;
     protected User currentUser;
 
-    public Controller(TextUserInterface textUserInterface, User currentUser) {
-        this.textUserInterface = textUserInterface;
+    public Controller(View view, User currentUser) {
+        this.view = view;
         this.currentUser = currentUser;
     }
 

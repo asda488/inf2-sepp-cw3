@@ -5,9 +5,9 @@ import java.util.EnumSet;
 
 public class MenuController extends Controller {
 
-    private UserController userController;
-    private BookingController bookingController;
-    private EventPerformanceController eventPerformanceController;
+    private final UserController userController;
+    private final BookingController bookingController;
+    private final EventPerformanceController eventPerformanceController;
 
     enum GuestMenuOptions {
         LOGIN,
@@ -39,13 +39,13 @@ public class MenuController extends Controller {
         SPONSOR_PERFORMANCE
     }
 
-    public MenuController(TextUserInterface textUserInterface) {
-        super(textUserInterface, null);
+    public MenuController(View view, VerificationSystem verificationSystem) {
+        super(view, null);
 
         //initialise sub-controllers
-        this.userController = new UserController(textUserInterface, this.currentUser);
-        this.bookingController = new BookingController(textUserInterface, this.currentUser);
-        this.eventPerformanceController = new EventPerformanceController(textUserInterface, this.currentUser);
+        this.userController = new UserController(view, verificationSystem, this.currentUser);
+        this.bookingController = new BookingController(view, this.currentUser);
+        this.eventPerformanceController = new EventPerformanceController(view, this.currentUser);
     }
 
     /**
@@ -58,53 +58,93 @@ public class MenuController extends Controller {
     @Override
     public <T> int selectFromMenu(Collection<T> menu, String item){
         int inputNumber = -1; //initalise the inputNumber as -1 to start the loop
-        while (!(inputNumber >= 1 && inputNumber <= menu.size())){
+        while (!(inputNumber >= 0 && inputNumber <= menu.size())){
             //pretty print with counter
-            String fullMenu = "";
+            String fullMenu = "Menu:\n";
             int i = 1;
             for (T t : menu){
                 String menuOption = t.toString().replace("_", " ");
-                fullMenu = fullMenu.concat(String.format("\n%d. %s", i, menuOption));
+                fullMenu = fullMenu.concat(String.format("%d. %s\n", i, menuOption));
                 i++;
             }
             //get input and return
-            String input = this.textUserInterface.getInput(
-                String.format("%s\nPlease enter the number corresponding to the action you wish to take", fullMenu));
-            inputNumber = Integer.parseInt(input);
+            String input = this.view.getInput(
+                String.format("%sPlease enter the number corresponding to the action you wish to take, or enter 0 to exit", fullMenu));
+            try {
+                inputNumber = Integer.parseInt(input);
+            } catch (NumberFormatException e) {
+                this.view.displayError(
+                    String.format("Input not recognised, please enter a number from 0 to %d.", menu.size())
+                );
+            }
         }
         return inputNumber - 1;
     }
 
+    /**
+     * Action called from mainMenu loop to synchronise userController.currentUser across all controllers.
+     */
+    private void synchroniseUserFromUserController(){
+        this.currentUser = userController.currentUser;
+        this.bookingController.currentUser = this.currentUser;
+        this.eventPerformanceController.currentUser = this.currentUser;
+    }
+
+    /**
+     * Main application loop of the program, runs until exit is requested.
+     */
     public void mainMenu(){
+        Boolean run = true;
+        int selectionIndex = -1;
         //main loop
-        while (true){
-            //set and display correct menu, and then switch over menu to run correct command
+        while (run){
+            //set and display correct menu, and then switch over menu to run correct action
             if (this.checkCurrentUserIsStudent()){
-                switch (StudentMenuOptions.values()[this.selectFromMenu(EnumSet.allOf(StudentMenuOptions.class), "")]){
-                    case LOGOUT -> {
-                        this.userController.logout();
-                        this.currentUser = userController.currentUser;
-                        this.bookingController.currentUser = this.currentUser;
-                        this.eventPerformanceController.currentUser = this.currentUser;
+                selectionIndex = this.selectFromMenu(EnumSet.allOf(StudentMenuOptions.class), "");
+                if (selectionIndex != -1){
+                    switch (StudentMenuOptions.values()[selectionIndex]){
+                        case LOGOUT -> {
+                            this.userController.logout();
+                            this.synchroniseUserFromUserController();
+                        }
                     }
                 }
             } else if (this.checkCurrentUserIsEntertainmentProvider()){
-                switch (EPMenuOptions.values()[this.selectFromMenu(EnumSet.allOf(EPMenuOptions.class), "")]){
+                selectionIndex = this.selectFromMenu(EnumSet.allOf(EPMenuOptions.class), "");
+                if (selectionIndex != -1){
+                    switch (EPMenuOptions.values()[selectionIndex]){
+                        case LOGOUT -> {
+                            this.userController.logout();
+                            this.synchroniseUserFromUserController();
+                        }
+                    }
                 }
             } else if (this.checkCurrentUserIsAdmin()){
-                switch (AdminMenuOptions.values()[this.selectFromMenu(EnumSet.allOf(AdminMenuOptions.class), "")]){
+                selectionIndex = this.selectFromMenu(EnumSet.allOf(AdminMenuOptions.class), "");
+                if (selectionIndex != -1){
+                    switch (AdminMenuOptions.values()[selectionIndex]){
+                        case LOGOUT -> {
+                            this.userController.logout();
+                            this.synchroniseUserFromUserController();
+                        }
+                    }
                 }
             } else if (this.checkCurrentUserIsGuest()){
-                switch (GuestMenuOptions.values()[this.selectFromMenu(EnumSet.allOf(GuestMenuOptions.class), "")]){
-                    case LOGIN -> {
+                selectionIndex = this.selectFromMenu(EnumSet.allOf(GuestMenuOptions.class), "");
+                if (selectionIndex != -1){
+                    switch (GuestMenuOptions.values()[selectionIndex]){
+                        case LOGIN -> {
                             this.userController.login();
-                        this.currentUser = userController.currentUser;
-                        this.bookingController.currentUser = this.currentUser;
-                        this.eventPerformanceController.currentUser = this.currentUser;
+                            this.synchroniseUserFromUserController();
+                        }
+                        case REGISTER_EP -> this.userController.registerEntertainmentProvider();
                     }
-                    case REGISTER_EP -> this.userController.registerEntertainmentProvider();
                 }
-            }  
+            } 
+            //if exit was requested, set the run variable to false
+            if (selectionIndex == -1){
+                run = false;
+            }
         }
     }
 }

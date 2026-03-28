@@ -2,8 +2,8 @@ package com.acmecorp;
 
 public class EventPerformanceController extends Controller{
     
-    public EventPerformanceController(TextUserInterface textUserInterface, User currentUser) {
-        super(textUserInterface, currentUser);
+    public EventPerformanceController(View view, User currentUser) {
+        super(view, currentUser);
     }
     
 }

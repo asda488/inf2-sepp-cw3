@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import com.opencsv.CSVReader;
@@ -15,13 +16,16 @@ public class UserController extends Controller{
     final URL PREGISTERED_ADMIN_FILE_PATH = getClass().getClassLoader().getResource("admin.csv");
 
     //Email indexed hashmaps to store registered users
-    private HashMap<String, Student> students = new HashMap<>();
-    private HashMap<String, AdminStaff> adminStaffs = new HashMap<>();
-    private HashMap<String, EntertainmentProvider> entertainmentProviders = new HashMap<>();
+    private final HashMap<String, Student> students = new HashMap<>();
+    private final HashMap<String, AdminStaff> adminStaffs = new HashMap<>();
+    private final HashMap<String, EntertainmentProvider> entertainmentProviders = new HashMap<>();
+
+    private final VerificationSystem verificationSystem;
 
     //constructor
-    public UserController(TextUserInterface textUserInterface, User currentUser){
-        super(textUserInterface, currentUser);
+    public UserController(View view, VerificationSystem verificationSystem,User currentUser){
+        super(view, currentUser);
+        this.verificationSystem = verificationSystem;
         this.addPreregisteredUsers();
     }
 
@@ -30,11 +34,14 @@ public class UserController extends Controller{
      * updating the currentUser if login is found and successful.
      */
     public void login(){
+        //sanity check
+        assert this.checkCurrentUserIsGuest();
         //get user's credentials and look up the user by email
-        String email = this.textUserInterface.getInput("Please enter your email").toLowerCase();
-        String password = this.textUserInterface.getInput("Please enter your password");
+        String email = this.view.getInput("Please enter your email").toLowerCase();
+        String password = this.view.getInput("Please enter your password");
         User foundUser = Stream.of(this.students, this.adminStaffs, this.entertainmentProviders)
             .map(user -> user.get(email))
+            .filter(Objects::nonNull)
             .findFirst()
             .orElse(null);
         
@@ -42,14 +49,12 @@ public class UserController extends Controller{
         if (foundUser != null){
             if (foundUser.getPassword().equals(password)){
                 this.currentUser = foundUser;
-                this.textUserInterface.displaySuccess(String.format("Logged in with email %s, account type %s.", email, currentUser.getClass()));
-
+                this.view.displaySuccess(String.format("Logged in with email %s.", email));
             } else {
-                this.textUserInterface.displayError("Password incorrect.");
+                this.view.displayError("Password incorrect.");
             }
-
         } else {
-            this.textUserInterface.displayError("Account not found.");
+            this.view.displayError("Account not found.");
         }
     }
 
@@ -57,35 +62,42 @@ public class UserController extends Controller{
      * Logs the user out, setting the currentUser to null
      */
     public void logout(){
+        //sanity check
+        assert !this.checkCurrentUserIsGuest();
         this.currentUser = null;
-        textUserInterface.displaySuccess("Successfully logged out.");
+        view.displaySuccess("Successfully logged out.");
     }
 
     /**
      * Attempt to register an entertainment provider using the correct details, failing if it is already registered
      */
     public void registerEntertainmentProvider(){
+        //sanity check
+        assert this.checkCurrentUserIsGuest();
         //ask for initial information
-        String email = this.textUserInterface.getInput("Please enter the email for the entertainment provider account").toLowerCase();
-        String orgName = this.textUserInterface.getInput("Please enter the organsation name of the entertainment provider");
-        String businessNumber = this.textUserInterface.getInput("Please enter the business number of the entertainment provider").toLowerCase();
+        String email = this.view.getInput("Please enter the email for the entertainment provider account").toLowerCase();
+        String orgName = this.view.getInput("Please enter the organsation name of the entertainment provider");
+        String businessNumber = this.view.getInput("Please enter the business number of the entertainment provider").toLowerCase();
 
-        //TODO: mock verification system full mock
         //TODO: input validation
 
         //if initial information finds an EP, fail, else carry on with registration
         if (this.EPAccountAlreadyExists(email, orgName, businessNumber)){
-            this.textUserInterface.displayError("Entertainment provider is already registered, please log in instead.");
+            this.view.displayError("Entertainment provider is already registered, please log in instead.");
+        } else if (!this.verificationSystem.verifyEntertainmentProvider(businessNumber)) { //else incorrect business number
+            this.view.displayError("Incorrect business number.");
         } else {
-            String password = this.textUserInterface.getInput("Please enter the password for the entertainment provider account");
-            String description = this.textUserInterface.getInput("Please enter a description for the entertainment provider account");
-            String name = this.textUserInterface.getInput("Please enter a name for the entertainment provider account");
+            String password = this.view.getInput("Please enter the password for the entertainment provider account");
+            String description = this.view.getInput("Please enter a description for the entertainment provider account");
+            String name = this.view.getInput("Please enter a name for the entertainment provider account");
             addUser(new EntertainmentProvider(email, password, businessNumber, description, name, orgName));
-            this.textUserInterface.displaySuccess("Entertainment provider successfully registered, please log in.");
+            this.view.displaySuccess("Entertainment provider successfully registered, please log in.");
         }
     }
 
     public void editPreferences(){
+        //check we are a student
+        assert this.checkCurrentUserIsStudent();
 
     }
 
@@ -127,7 +139,7 @@ public class UserController extends Controller{
             usersCSV.remove(0);
             adminsCSV.remove(0);
         } catch (CsvException | IOException e){
-            this.textUserInterface.displayError("Error in pre-registering users, list of pre-registered users and admins will be empty.");
+            this.view.displayError("Error in pre-registering users, list of pre-registered users and admins will be empty.");
         }
 
         //create objects from CSV lists and add to internal lists
@@ -140,8 +152,10 @@ public class UserController extends Controller{
     }
 
     private Boolean EPAccountAlreadyExists(String email, String orgName, String businessNumber){
-        //firstly check if there is an EP account with the given email
-        if (this.entertainmentProviders.containsKey("email")){
+        //firstly check if there is any type of account with the given email
+        if (this.entertainmentProviders.containsKey(email)
+            || this.adminStaffs.containsKey(email)
+            || this.students.containsKey(email)){
             return true;
         }
         //else manual iteration through the list
