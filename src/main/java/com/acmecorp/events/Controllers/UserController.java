@@ -1,4 +1,4 @@
-package com.acmecorp;
+package com.acmecorp.events.Controllers;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -8,6 +8,12 @@ import java.util.LinkedList;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import com.acmecorp.events.Models.AdminStaff;
+import com.acmecorp.events.Models.EntertainmentProvider;
+import com.acmecorp.events.Models.Student;
+import com.acmecorp.events.Models.User;
+import com.acmecorp.events.Services.VerificationSystem;
+import com.acmecorp.events.Views.View;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
 
@@ -23,7 +29,7 @@ public class UserController extends Controller{
     private final VerificationSystem verificationSystem;
 
     //constructor
-    public UserController(View view, VerificationSystem verificationSystem,User currentUser){
+    public UserController(View view, VerificationSystem verificationSystem, User currentUser){
         super(view, currentUser);
         this.verificationSystem = verificationSystem;
         this.addPreregisteredUsers();
@@ -56,6 +62,7 @@ public class UserController extends Controller{
         } else {
             this.view.displayError("Account not found.");
         }
+        //TODO:change some of these strings to be a bit more informative
     }
 
     /**
@@ -76,16 +83,16 @@ public class UserController extends Controller{
         assert this.checkCurrentUserIsGuest();
         //ask for initial information
         String email = this.view.getInput("Please enter the email for the entertainment provider account").toLowerCase();
-        String orgName = this.view.getInput("Please enter the organsation name of the entertainment provider");
+        String orgName = this.view.getInput("Please enter the organisation name of the entertainment provider");
         String businessNumber = this.view.getInput("Please enter the business number of the entertainment provider").toLowerCase();
 
-        //TODO: input validation
+        //TODO: input validation, email type input validation
 
         //if initial information finds an EP, fail, else carry on with registration
         if (this.EPAccountAlreadyExists(email, orgName, businessNumber)){
             this.view.displayError("Entertainment provider is already registered, please log in instead.");
         } else if (!this.verificationSystem.verifyEntertainmentProvider(businessNumber)) { //else incorrect business number
-            this.view.displayError("Incorrect business number.");
+            this.view.displayError("Business number cannot be verified.");
         } else {
             String password = this.view.getInput("Please enter the password for the entertainment provider account");
             String description = this.view.getInput("Please enter a description for the entertainment provider account");

@@ -1,4 +1,4 @@
-package com.acmecorp;
+package com.acmecorp.events.Models;
 
 public abstract class User {
     private String email;

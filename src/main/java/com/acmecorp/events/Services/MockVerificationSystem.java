@@ -1,4 +1,4 @@
-package com.acmecorp;
+package com.acmecorp.events.Services;
 
 import java.util.Arrays;
 import java.util.HashSet;

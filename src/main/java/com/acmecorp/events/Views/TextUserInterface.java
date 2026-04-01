@@ -1,4 +1,4 @@
-package com.acmecorp;
+package com.acmecorp.events.Views;
 
 import java.util.Collection;
 import java.util.Scanner;

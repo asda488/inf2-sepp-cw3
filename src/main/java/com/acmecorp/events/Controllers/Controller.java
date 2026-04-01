@@ -1,6 +1,12 @@
-package com.acmecorp;
+package com.acmecorp.events.Controllers;
 
 import java.util.Collection;
+
+import com.acmecorp.events.Models.AdminStaff;
+import com.acmecorp.events.Models.EntertainmentProvider;
+import com.acmecorp.events.Models.Student;
+import com.acmecorp.events.Models.User;
+import com.acmecorp.events.Views.View;
 
 public abstract class Controller {
 
@@ -44,4 +50,12 @@ public abstract class Controller {
     public <T> int selectFromMenu(Collection<T> menu, String item){
         throw new UnsupportedOperationException("Not supported yet.");
     };
+
+    public User getCurrentUser() {
+        return currentUser;
+    }
+
+    public void setCurrentUser(User currentUser) {
+        this.currentUser = currentUser;
+    }
 }

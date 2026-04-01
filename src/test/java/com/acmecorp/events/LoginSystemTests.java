@@ -1,4 +1,4 @@
-package com.acmecorp;
+package com.acmecorp.events;
 
 import java.util.Arrays;
 import java.util.List;
@@ -37,9 +37,11 @@ public class LoginSystemTests extends SystemTestsBase {
         arguments("peridot@hindeburgh.ac.uk","letmein"),
         arguments("topaz@example.com","malicious")
     );
-
+    
+    /**
+     * Attempt login with mocked inputs
+     */
     void attemptLoginAndExit(String email, String password){
-        //attempt login with mocked inputs
         //while on a menu, select the login in action, and then exit the next time
         when(this.textUserInterfaceMock.getInput(Mockito.contains("Menu"))).thenReturn("1").thenReturn("0"); 
         when(this.textUserInterfaceMock.getInput(Mockito.contains("email"))).thenReturn(email); //fill in email
@@ -47,6 +49,7 @@ public class LoginSystemTests extends SystemTestsBase {
         this.menuController.mainMenu(); 
     }
 
+    /** Check students can log in succesfully */
     @ParameterizedTest
     @FieldSource("STUDENT_LOGIN_CREDENTIALS")
     void loginStudentSuccess(String email, String password){
@@ -56,6 +59,7 @@ public class LoginSystemTests extends SystemTestsBase {
             .displaySuccess(String.format("Logged in with email %s.", email));
     }
 
+    /** Check admins can log in succesfully */
     @ParameterizedTest
     @FieldSource("ADMIN_LOGIN_CREDENTIALS")
     void loginAdminSuccess(String email, String password){
@@ -65,6 +69,7 @@ public class LoginSystemTests extends SystemTestsBase {
             .displaySuccess(String.format("Logged in with email %s.", email));
     }
 
+    /** Check that logging in with the wrong email yields the correct error */
     @ParameterizedTest
     @FieldSource("INVALID_EMAIL_LOGIN_CREDENTIALS")
     void loginInvalidEmailFail(String email, String password){
@@ -74,6 +79,7 @@ public class LoginSystemTests extends SystemTestsBase {
             .displayError("Account not found.");
     }
 
+    /** Check that logging in with the wrong password yields the correct error */
     @ParameterizedTest
     @FieldSource("INVALID_PASSWORD_LOGIN_CREDENTIALS")
     void loginInvalidPasswordFail(String email, String password){
@@ -82,4 +88,6 @@ public class LoginSystemTests extends SystemTestsBase {
             .description("Student login was successful even though password was incorrect."))
             .displayError("Password incorrect.");
     }
+
+    //TODO:expand to EP
 }

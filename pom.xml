@@ -3,11 +3,11 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.acmecorp</groupId>
-  <artifactId>events-app</artifactId>
+  <groupId>com.acmecorp.events</groupId>
+  <artifactId>events</artifactId>
   <version>1.0-SNAPSHOT</version>
 
-  <name>events-app</name>
+  <name>events</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -108,7 +108,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.6.3</version>
                 <configuration>
-                    <mainClass>com.acmecorp.Main</mainClass>
+                    <mainClass>com.acmecorp.events.Main</mainClass>
                 </configuration>
             </plugin>
       </plugins>

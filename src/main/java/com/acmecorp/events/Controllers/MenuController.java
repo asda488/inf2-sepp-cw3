@@ -1,7 +1,10 @@
-package com.acmecorp;
+package com.acmecorp.events.Controllers;
 
 import java.util.Collection;
 import java.util.EnumSet;
+
+import com.acmecorp.events.Models.User;
+import com.acmecorp.events.Views.View;
 
 public class MenuController extends Controller {
 
@@ -39,13 +42,15 @@ public class MenuController extends Controller {
         SPONSOR_PERFORMANCE
     }
 
-    public MenuController(View view, VerificationSystem verificationSystem) {
+    public MenuController(UserController userController, BookingController bookingController,
+        EventPerformanceController eventPerformanceController, View view, User currentUser) {
         super(view, null);
+        this.currentUser = currentUser;
 
-        //initialise sub-controllers
-        this.userController = new UserController(view, verificationSystem, this.currentUser);
-        this.bookingController = new BookingController(view, this.currentUser);
-        this.eventPerformanceController = new EventPerformanceController(view, this.currentUser);
+        //set sub-controllers
+        this.userController = userController;
+        this.bookingController = bookingController;
+        this.eventPerformanceController = eventPerformanceController;
     }
 
     /**
@@ -86,8 +91,8 @@ public class MenuController extends Controller {
      */
     private void synchroniseUserFromUserController(){
         this.currentUser = userController.currentUser;
-        this.bookingController.currentUser = this.currentUser;
-        this.eventPerformanceController.currentUser = this.currentUser;
+        this.bookingController.setCurrentUser(this.currentUser);
+        this.eventPerformanceController.setCurrentUser(this.currentUser);
     }
 
     /**

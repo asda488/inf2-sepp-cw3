@@ -1,4 +1,4 @@
-package com.acmecorp;
+package com.acmecorp.events.Models;
 
 public class AdminStaff extends User{
     private String name;

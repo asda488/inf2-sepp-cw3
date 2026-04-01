@@ -1,4 +1,4 @@
-package com.acmecorp;
+package com.acmecorp.events.Services;
 
 public interface VerificationSystem {
     public Boolean verifyEntertainmentProvider(String businessRegistrationNumber);
