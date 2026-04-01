@@ -92,7 +92,7 @@ public class RegisterEPSystemTests extends SystemTestsBase{
             .displayError("Business number cannot be verified.");
     }
     
-    /** Check that duplicate registrations (same email, organisation name, business number). */
+    /** Check that duplicate registrations (same email, organisation name, business number) fail. */
     @ParameterizedTest
     @FieldSource("INVALID_EXISTING_EP_CREDENTIALS")
     void registerExistingEPFail(String email, String orgName, String businessNumber,
