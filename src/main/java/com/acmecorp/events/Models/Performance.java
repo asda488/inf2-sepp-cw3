@@ -18,7 +18,7 @@ public class Performance () {
     private Collection<String> reviewComments;
     private PerformanceStatus status;
     
-    public  cancel() {
+    public void cancel() {
         
     }
 
