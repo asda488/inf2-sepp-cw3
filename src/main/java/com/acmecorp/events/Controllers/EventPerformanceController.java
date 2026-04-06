@@ -214,7 +214,8 @@ public class EventPerformanceController extends Controller{
             ", Venue Address = " + performance.getVenueAddress() + 
             ", Capacity = " + String.valueOf(performance.getVenueCapacity()) + 
             ", Outdoors = " + String.valueOf(performance.getVenueIsOutdoors()) + 
-            ", Smoking = " + String.valueOf(performance.getVenueAllowsSmoking()));
+            ", Smoking = " + String.valueOf(performance.getVenueAllowsSmoking()) + 
+            ", Status = " + String.valueOf(performance.getStatus()));
             this.view.displaySuccess("Performance with ID " + String.valueOf(selectedPerformanceID) + " successfully found") 
         }
     }

@@ -219,15 +219,16 @@ public class Performance () {
 
     public String toString() {
         return ("Event = " + event.getTitle() + 
-        ", PerformanceID = " + performanceID + 
-        ", Start Date and Time = " + startDateTime + 
-        ", End Date and Time = " + endDateTime + 
+        ", PerformanceID = " + String.valueOf(performanceID) + 
+        ", Start Date and Time = " + startDateTime.toString() + 
+        ", End Date and Time = " + endDateTime.toString() + 
         ", Performers = " + performerNames + 
-        ", Price = " + ticketPrice + 
-        ", No. of Tickets = " + (numTicketsTotal-numTicketsSold) + 
+        ", Price = " + String.valueOf(ticketPrice) + 
+        ", No. of Tickets = " + String.valueOf((numTicketsTotal-numTicketsSold)) + 
         ", Venue Address = " + venueAddress + 
-        ", Capacity = " + venueCapacity + 
-        ", Outdoors = " + venueIsOutdoors + 
-        ", Smoking = " + venueAllowsSmoking);
+        ", Capacity = " + String.valueOf(venueCapacity) + 
+        ", Outdoors = " + String.valueOf(venueIsOutdoors) + 
+        ", Smoking = " + String.valueOf(venueAllowsSmoking) + 
+        ", Status = " + String.valueOf(status));
     }
 }
