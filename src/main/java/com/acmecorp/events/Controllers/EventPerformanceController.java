@@ -22,12 +22,13 @@ public class EventPerformanceController extends Controller{
         super(view, currentUser);
         this.nextEventID = 0;
         this.nextPerformanceID = 0;
+        this.events = new ArrayList<>();
     }
 
     public Event createEvent() {
         while (true) {
                 String title = this.view.getInput("What is the name of the event?").trim();
-                if (!title.empty()) {
+                if (!title.isEmpty()) {
                     break; //valid input causes loop exit
                 }
                 this.view.displayError("Invalid input, try again.")
@@ -119,7 +120,7 @@ public class EventPerformanceController extends Controller{
 
             while (true) {
                 String venueAddress = this.view.getInput("Enter the venue address:").trim();
-                if (!venueAddress.empty()) {
+                if (!venueAddress.isEmpty()) {
                     break; //valid input causes loop exit
                 }
                 this.view.displayError("Invalid input, try again.")
@@ -160,11 +161,11 @@ public class EventPerformanceController extends Controller{
     public void searchForPerformances() {
         while (true) {
             try {
-                LocalDateTime searchDateTime = LocalDateTime.parse("Enter search date for performances (yyyy-MM-dd): ").toLocalDate();
-            } catch (DateTimeException e) {
+                LocalDate searchDate = LocalDate.parse(this.view.getInput("Enter search date for performances (yyyy-MM-dd): "));
+            } catch (DateException e) {
                 this.view.displayError("Invalid date, try again.");
             }
-            if (searchDateTime.isBefore(LocalDateTime.now())) {
+            if (!searchDateTime.isBefore(LocalDateTime.now())) {
                 break; // valid input causes loop exit
             }
             this.view.displayError("Invalid date, try again.");
@@ -172,7 +173,7 @@ public class EventPerformanceController extends Controller{
 
         List<Performance> performancesOnDate = new ArrayList<>();
         for (Event e : events) {
-            performances = e.getInfoForPerformancesOnDate();
+            Collection<String> performances = e.getInfoForPerformancesOnDate();
             for (String p : performances) {
                 performancesOnDate.add(p);
             }
@@ -194,7 +195,7 @@ public class EventPerformanceController extends Controller{
     public void viewPerformance() {
         while (true) {
             try {
-                long selectedPerformanceID = long.parseLong(this.view.getInput("Enter PerformanceID: "))
+                long selectedPerformanceID = Long.parseLong(this.view.getInput("Enter PerformanceID: "))
             } catch (NumberFormatException e) {
                 this.view.displayError("Invalid ID, try again")
             }
@@ -238,7 +239,7 @@ public class EventPerformanceController extends Controller{
 
     private Performance getPerformanceByID(long performanceID) {
         for (Event e : events) {
-            performances = e.getPerformances();
+            List<Performance> performances = e.getPerformances();
             for (Performance p : performances) {
                 if (performanceID.equals(p.getPerformanceID())) {
                     return p;
