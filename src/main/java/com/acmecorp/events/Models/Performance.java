@@ -3,7 +3,7 @@ import java.util.LocalDateTime;
 import static java.lang.Math.*;
 
 public class Performance () {
-    private long performanceId;
+    private long performanceID;
     private LocalDateTime startDateTime;
     private LocalDateTime endDateTime;
     private Collection<String> performersNames;
@@ -48,12 +48,12 @@ public class Performance () {
         this.bookings = new ArrayList<>();
     }
 
-    public long getPerformanceId() {
-        return performanceId;
+    public long getPerformanceID() {
+        return performanceID;
     }
 
-    public void setPerformanceId(long performanceId) {
-        this.performanceId = performanceId;
+    public void setPerformanceID(long performanceID) {
+        this.performanceID = performanceID;
     }
 
     public LocalDateTime getStartDateTime() {

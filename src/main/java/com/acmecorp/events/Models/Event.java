@@ -61,12 +61,43 @@ public class Event {
         return organiser;
     }
 
-    public void setOrganiser() {
-        this.organiser = organiser;
-    }
-
     public Performance createPerformance(Event event, long performanceID, LocalDateTime startDateTime, LocalDateTime endDateTime, Collection<String> performerNames, double ticketPrice, int numTickets, String venueAddress, int venueCapacity, boolean venueIsOutdoors, boolean venueAllowsSmoking) {
         Performance performance = new Performance(event, performanceID, startDateTime, endDateTime, performerNames, ticketPrice, numTickets, venueAddress, venueCapacity, venueIsOutdoors, venueAllowsSmoking);
         return performance;
+    }
+
+    public Performance getPerformanceByID(long performanceID) {
+        for (Performance performance : performances) {
+            if (performance.getPerformanceID() == performanceID) {
+                return performance;
+            }
+        }
+        throw new IllegalArgumentException("Performance with ID " + performanceID + " not found");
+    }
+
+    public Collection<String> getInfoForPerformancesOnDate(LocalDateTime searchDateTime) {
+        private List<String> performancesOnDate;
+        for (Performance performance : performances) {
+            if (performance.getStartDateTime().toLocalDate().equals(searchDateTime.toLocalDate())) {
+                performancesOnDate.add(performance);
+            }
+        }
+        return performancesOnDate;
+    }
+
+    private String getOrganiserName() {
+        return this.organiser.getOrgName();
+    }
+
+    public String getOrganiserEmail() {
+        return this.organiser.getEmail();
+    }
+    
+    public double getAverageRatingOfPerformances() {
+
+    }
+
+    public boolean hasPerformancesAtSameTime(LocalDateTime startDateTime, LocalDateTime endDateTime) {
+        
     }
 }
