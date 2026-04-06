@@ -4,15 +4,17 @@ public class Event {
     private long eventID;
     private String title;
     private EventType type;
-    private Boolean isTicketed;
+    private boolean isTicketed;
     private List<Performance> performances;
+    private EntertainmentProvider organiser;
 
-    public Event(long eventID, String title, EventType type, Boolean isTicketed, List<Performance> performances) {
+    public Event(long eventID, String title, EventType type, boolean isTicketed, List<Performance> performances, EntertainmentProvider organiser) {
         this.eventID = eventID;
         this.title = title;
         this.type = type;
         this.isTicketed = isTicketed;
         this.performances = performances;
+        this.organiser = organiser;
     }
 
     public long getID() {
@@ -39,11 +41,11 @@ public class Event {
         this.type = type;
     }
 
-    public Boolean getTicketed() {
+    public boolean getTicketed() {
         return isTicketed;
     }
 
-    public void setTicketed(Boolean isTicketed) {
+    public void setTicketed(boolean isTicketed) {
         this.isTicketed = isTicketed;
     }
 
@@ -55,7 +57,16 @@ public class Event {
         this.performances = performances;
     }
 
-    public Performance createPerformance(int nextPerformanceID, LocalDateTime start, LocalDateTime end, List<String> performers, float price, int ticketCount, String venueAddress, int venueCapacity, boolean isOutdoors, boolean canSmoke) {
-        Performance performance = new Performance(nextPerformanceID, start, end, performers, price, ticketCount, venueAddress, venueCapacity, isOutdoors, canSmoke);
+    public EntertainmentProvider getOrganiser() {
+        return organiser;
+    }
+
+    public void setOrganiser() {
+        this.organiser = organiser;
+    }
+
+    public Performance createPerformance(Event event, long performanceID, LocalDateTime startDateTime, LocalDateTime endDateTime, Collection<String> performerNames, double ticketPrice, int numTickets, String venueAddress, int venueCapacity, boolean venueIsOutdoors, boolean venueAllowsSmoking) {
+        Performance performance = new Performance(event, performanceID, startDateTime, endDateTime, performerNames, ticketPrice, numTickets, venueAddress, venueCapacity, venueIsOutdoors, venueAllowsSmoking);
+        return performance;
     }
 }
