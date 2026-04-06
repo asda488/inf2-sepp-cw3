@@ -46,4 +46,8 @@ public class EntertainmentProvider extends User {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    public String getOrgEmail() {
+        return this.getEmail();
+    }
 }

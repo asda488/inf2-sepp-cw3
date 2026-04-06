@@ -1,22 +1,21 @@
 package com.acmecorp.events.Controllers;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
-import com.acmecorp.events.Models.User;
+import com.acmecorp.events.Models.*;
 import com.acmecorp.events.Views.View;
 
 public class EventPerformanceController extends Controller{
     private long nextEventID;
     private long nextPerformanceID;
     private List<Event> events;
-
-    enum EventType {
-        MUSIC,
-        THEATRE,
-        DANCE,
-        MOVIE,
-        SPORTS
-    }
 
     public EventPerformanceController(View view, User currentUser) {
         super(view, currentUser);
@@ -31,18 +30,20 @@ public class EventPerformanceController extends Controller{
             return null;
         }
 
+        String title;
         while (true) {
-                String title = this.view.getInput("Enter event title: ").trim();
-                if (!title.isEmpty()) {
-                    break; //valid input causes loop exit
-                }
-                this.view.displayError("Invalid input, try again.")
+            title = this.view.getInput("Enter event title: ").trim();
+            if (!title.isEmpty()) {
+                break; //valid input causes loop exit
             }
+            this.view.displayError("Invalid input, try again.");
+        }
 
+        EventType type;
         while (true) {
-            String type = this.view.getInput("Enter event type (Music/Theatre/Dance/Movie/Sports): ").trim();
+            String typeInput = this.view.getInput("Enter event type (Music/Theatre/Dance/Movie/Sports): ").trim();
             try {
-                EventType event = EventType.valueOf(input.toUpperCase());
+                type = EventType.valueOf(typeInput.toUpperCase());
                 break; // valid input causes loop exit
             } catch (IllegalArgumentException e) {
                 this.view.displayError("Invalid type, try again.");
@@ -53,7 +54,7 @@ public class EventPerformanceController extends Controller{
         while (true) {
             String ticketedInput = this.view.getInput("Is the event ticketed (yes/no): ").trim();
             isTicketed = ticketedInput.equalsIgnoreCase("yes");
-            if ticketedInput.equalsIgnoreCase("yes") || ticketedInput.equalsIgnoreCase("no") {
+            if (ticketedInput.equalsIgnoreCase("yes") || ticketedInput.equalsIgnoreCase("no")) {
                 break; // valid input causes loop exit
             }
             this.view.displayError("Invalid choice, try again.");
@@ -68,19 +69,22 @@ public class EventPerformanceController extends Controller{
                 this.view.displayError("Invalid number, try again.");
             }
         }
+        List<Performance> performances = new ArrayList<>();
 
-        Event event = new Event(nextEventID, title, type, isTicketed, currentUser);
+        Event event = new Event(nextEventID, title, type, isTicketed, performances, (EntertainmentProvider) currentUser);
         events.add(event);
         nextEventID++;
 
         for (int i = 1; i <= noOfPerformances; i++) {
-            System.out.println("Performance " + i)
+            System.out.println("Performance " + i);
 
+            LocalDateTime startDateTime;
+            LocalDateTime endDateTime;
             while (true) {
                 try {
-                    LocalDateTime startDateTime = LocalDateTime.parse(...);
-                    LocalDateTime endDateTime = LocalDateTime.parse(...);
-                    if (endDateTime.isAfter(startDateTime) && !hasPerformancesAtSameTime(startDateTime, endDateTime)) {
+                    startDateTime = LocalDateTime.parse("Enter the start date and time (yyyy-MM-ddTHH:mm): ");
+                    endDateTime = LocalDateTime.parse("Enter the end date and time (yyyy-MM-ddTHH:mm): ");
+                    if (endDateTime.isAfter(startDateTime) && !event.hasPerformancesAtSameTime(startDateTime, endDateTime)) {
                         break;
                     } else if (!endDateTime.isAfter(startDateTime)) {
                         this.view.displayError("Invalid end time, try again.");
@@ -92,19 +96,22 @@ public class EventPerformanceController extends Controller{
                 } 
             }
 
+            String performersInput;
             while (true) {
-                String performersInput = this.view.getInput("Enter name(s) of the performer(s) (comma-separated): ").trim();
+                performersInput = this.view.getInput("Enter name(s) of the performer(s) (comma-separated): ").trim();
                 if (!performersInput.isEmpty()) {
                     break; // valid input causes loop exit
                 }
                 this.view.displayError("Invalid string, try again.");
             }
-            List<String> performerNames = Arrays.stream(performersInput.split(",")).map(String::trim).filter(s -> !s.isEmpty()).collect(Collectors.toList()); 
+            List<String> performerNames = Arrays.stream(performersInput.split(",")).map(String::trim).filter(s -> !s.isEmpty()).collect(Collectors.toList());
 
+            double ticketPrice;
+            int numTickets;
             if (isTicketed) {
                 while (true) {
                     try {
-                        double ticketPrice = Double.parseDouble(this.view.getInput("Enter the ticket price: £"));
+                        ticketPrice = Double.parseDouble(this.view.getInput("Enter the ticket price: £"));
                         break; // valid input causes loop exit
                     } catch (NumberFormatException e) {
                         this.view.displayError("Invalid price, try again.");
@@ -112,7 +119,7 @@ public class EventPerformanceController extends Controller{
                 }
                 while (true) {
                     try {
-                        int numTickets = Integer.parseInt(this.view.getInput("Enter the remaining number of tickets: "));
+                        numTickets = Integer.parseInt(this.view.getInput("Enter the remaining number of tickets: "));
                         if (numTickets > 0) {
                          break; //valid input causes loop exit
                         }
@@ -121,39 +128,46 @@ public class EventPerformanceController extends Controller{
                     }
                 }
             } else {
-                double ticketPrice = 0;
-                int numTickets = 0;
+                ticketPrice = 0;
+                numTickets = 0;
             }
 
+            String venueAddress;
             while (true) {
-                String venueAddress = this.view.getInput("Enter the venue address: ").trim();
+                venueAddress = this.view.getInput("Enter the venue address: ").trim();
                 if (!venueAddress.isEmpty()) {
                     break; //valid input causes loop exit
                 }
-                this.view.displayError("Invalid input, try again.")
+                this.view.displayError("Invalid input, try again.");
             }
 
+            int venueCapacity;
             while (true) {
-                int venueCapacity = this.view.getInput("Enter the venue capacity: ");
-                if (venueCapacity > 0) {
-                    break; //valid input causes loop exit
+                try {
+                    venueCapacity = Integer.parseInt(this.view.getInput("Enter the venue capacity: "));
+                    if (venueCapacity > 0) {
+                        break; //valid input causes loop exit
+                    }
+                } catch (NumberFormatException e) {
+                    this.view.displayError("Invalid number, try again.");
                 }
-                this.view.displayError("Invalid number, try again.");
             }
 
+            boolean venueIsOutdoors;
             while (true) {
                 String outdoorsInput = this.view.getInput("Is the venue outdoors (yes/no): ").trim();
-                boolean venueIsOutdoors = outdoorsInput.equalsIgnoreCase("yes");
-                if outdoorsInput.equalsIgnoreCase("yes") || outdoorsInput.equalsIgnoreCase("no") {
+                venueIsOutdoors = outdoorsInput.equalsIgnoreCase("yes");
+                if (outdoorsInput.equalsIgnoreCase("yes") || outdoorsInput.equalsIgnoreCase("no")) {
                     break; // valid input causes loop exit
                 }
                 this.view.displayError("Invalid choice, try again.");
             }
 
+            boolean venueAllowsSmoking;
             while (true) {
                 String smokingInput = this.view.getInput("Does the venue allow smoking (yes/no): ").trim();
-                boolean venueAllowsSmoking = smokingInput.equalsIgnoreCase("yes");
-                if smokingInput.equalsIgnoreCase("yes") || smokingInput.equalsIgnoreCase("no") {
+                venueAllowsSmoking = smokingInput.equalsIgnoreCase("yes");
+                if (smokingInput.equalsIgnoreCase("yes") || smokingInput.equalsIgnoreCase("no")) {
                     break; // valid input causes loop exit
                 }
                 this.view.displayError("Invalid choice, try again.");
@@ -162,13 +176,15 @@ public class EventPerformanceController extends Controller{
             event.createPerformance(event, nextPerformanceID, startDateTime, endDateTime, performerNames, ticketPrice, numTickets, venueAddress, venueCapacity, venueIsOutdoors, venueAllowsSmoking);
             nextPerformanceID++;
         }
+
         return event;
     }
 
     public void searchForPerformances() {
+        LocalDate searchDate = null;
         while (true) {
             try {
-                LocalDate searchDate = LocalDate.parse(this.view.getInput("Enter search date for performances (yyyy-MM-dd): "));
+                searchDate = LocalDate.parse(this.view.getInput("Enter search date for performances (yyyy-MM-dd): "));
             } catch (DateTimeParseException e) {
                 this.view.displayError("Invalid date, try again.");
             }
@@ -178,12 +194,10 @@ public class EventPerformanceController extends Controller{
             this.view.displayError("Invalid date, try again.");
         }
 
-        List<Performance> performancesOnDate = new ArrayList<>();
+        List<String> performancesOnDate = new ArrayList<>();
         for (Event e : events) {
             Collection<String> performances = e.getInfoForPerformancesOnDate(searchDate);
-            for (String p : performances) {
-                performancesOnDate.add(p);
-            }
+            performancesOnDate.addAll(performances);
         }
 
         if (performancesOnDate.isEmpty()) {
@@ -191,21 +205,22 @@ public class EventPerformanceController extends Controller{
             return;
         }
 
-        if (currentUser.checkCurrentUserIsStudent()) {
+        if (checkCurrentUserIsStudent()) {
             //currentUser.getPreferences();
         }
 
         this.view.displayListofPerformances(performancesOnDate);
-        this.view.displaySuccess("Performances on " + searchDate.toString() + "successfully found")
+        this.view.displaySuccess("Performances on " + searchDate.toString() + "successfully found");
     }
 
     public void viewPerformance() {
+        long selectedPerformanceID;
         while (true) {
             try {
-                long selectedPerformanceID = Long.parseLong(this.view.getInput("Enter PerformanceID: "));
+                selectedPerformanceID = Long.parseLong(this.view.getInput("Enter PerformanceID: "));
                 break; // valid input exits loop
             } catch (NumberFormatException e) {
-                this.view.displayError("Invalid ID, try again")
+                this.view.displayError("Invalid ID, try again");
             }
         }
 
@@ -225,16 +240,17 @@ public class EventPerformanceController extends Controller{
             ", Outdoors = " + String.valueOf(performance.getVenueIsOutdoors()) + 
             ", Smoking = " + String.valueOf(performance.getVenueAllowsSmoking()) + 
             ", Status = " + String.valueOf(performance.getStatus()));
-            this.view.displaySuccess("Performance with ID " + String.valueOf(selectedPerformanceID) + " successfully found") 
+            this.view.displaySuccess("Performance with ID " + String.valueOf(selectedPerformanceID) + " successfully found");
         }
     }
 
     private Event getEventByID(long eventID) {
         for (Event e : events) {
-            if (eventID.equals(e.getEventID())) {
+            if (eventID == e.getEventID()) {
                 return e;
             }
         }
+        return null;
     }
 
     private Event getEventByTitle(String title) {
@@ -243,13 +259,14 @@ public class EventPerformanceController extends Controller{
                 return e;
             }
         }
+        return null;
     }
 
     private Performance getPerformanceByID(long performanceID) {
         for (Event e : events) {
             List<Performance> performances = e.getPerformances();
             for (Performance p : performances) {
-                if (performanceID.equals(p.getPerformanceID())) {
+                if (performanceID == p.getPerformanceID()) {
                     return p;
                 }
             }
