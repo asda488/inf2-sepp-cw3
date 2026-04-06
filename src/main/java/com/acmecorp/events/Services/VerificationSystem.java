@@ -1,5 +1,8 @@
 package com.acmecorp.events.Services;
 
 public interface VerificationSystem {
-    public boolean verifyEntertainmentProvider(String businessRegistrationNumber);
+
+    Boolean verifyStudent(String email);
+
+    Boolean verifyEntertainmentProvider(String businessNumber);
 }

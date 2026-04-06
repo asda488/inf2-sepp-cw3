@@ -1,20 +1,43 @@
 package com.acmecorp.events.Models;
 
-public class Student extends User{
+import java.util.ArrayList;
+import java.util.List;
+
+public class Student extends User {
+
     private String name;
     private String phoneNumber;
+    private final List<Review> reviews = new ArrayList<>();
+    private final List<Booking> bookings = new ArrayList<>();
 
-    /**
-     * Constructor for student
-     * @param email Email of student
-     * @param password Plaintext password of student
-     * @param name Full name of student
-     * @param phoneNumber Phone number of student as an integer
-     */
     public Student(String email, String password, String name, String phoneNumber) {
         super(email, password);
         this.name = name;
         this.phoneNumber = phoneNumber;
+    }
+
+    public void addReview(Review review) {
+        if (review != null) {
+            reviews.add(review);
+        }
+    }
+
+    public List<Review> getReviews() {
+        return new ArrayList<>(reviews);
+    }
+
+    public void addBooking(Booking booking) {
+        if (booking != null) {
+            bookings.add(booking);
+        }
+    }
+
+    public void removeBooking(Booking booking) {
+        bookings.remove(booking);
+    }
+
+    public List<Booking> getBookings() {
+        return new ArrayList<>(bookings);
     }
 
     public String getName() {
@@ -32,6 +55,4 @@ public class Student extends User{
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
-
-    
 }

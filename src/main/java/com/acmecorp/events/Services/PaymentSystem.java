@@ -1,8 +1,11 @@
 package com.acmecorp.events.Services;
 
 public interface PaymentSystem {
-    public boolean processPayment(int numTickets, String eventTitle, String studentEmail,
-        String studentPhone, String epEmail, double transactionAmount);
-    public boolean processRefund(int numTickets, String eventTitle, String studentEmail,
-        String studentPhone, String epEmail, double transactionAmount, String organiserMsg);
+
+    Boolean processPayment(int numTickets, String eventTitle, String studentEmail,
+                           String studentPhone, String epEmail, double transactionAmount);
+
+    Boolean processRefund(int numTickets, String eventTitle, String studentEmail,
+                          String studentPhone, String epEmail, double transactionAmount,
+                          String organiserMsg);
 }

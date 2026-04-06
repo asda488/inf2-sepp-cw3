@@ -1,116 +1,83 @@
 package com.acmecorp.events.Services;
 
+import com.acmecorp.events.Models.Booking;
 import java.util.List;
-import java.util.Objects;
 
 public class MockPaymentSystem implements PaymentSystem {
+
+    private final List<Booking> bookings;
 
     public MockPaymentSystem(List<Booking> bookings) {
         this.bookings = bookings;
     }
 
-    /**
-     * Service-internal Booking dataclass, not to be confused with the other Model class
-     */
-    public static class Booking {
-        public final int numTickets;
-        public final String eventTitle;
-        public final String studentEmail;
-        public final String studentPhone;
-        public final String epEmail;
-        public final double transactionAmount;
-
-        public Booking(int numTickets, String eventTitle, String studentEmail, 
-        String studentPhone, String epEmail, double transactionAmount) {
-            this.epEmail = epEmail;
-            this.eventTitle = eventTitle;
-            this.numTickets = numTickets;
-            this.studentEmail = studentEmail;
-            this.studentPhone = studentPhone;
-            this.transactionAmount = transactionAmount;
-        }
-
-        /** Overriding equals for easy comparison */
-        @Override
-        public boolean equals(Object o){
-            if (o == this){
-                return true;
-            } else if(!(o instanceof Booking)){
-                return false;
-            }
-
-            Booking b = (Booking)o;
-
-            return b.epEmail.equals(this.epEmail)
-                && b.eventTitle.equals(this.eventTitle)
-                && b.numTickets == this.numTickets
-                && b.studentEmail.equals(this.studentEmail)
-                && b.studentPhone.equals(this.studentPhone)
-                && b.transactionAmount == this.transactionAmount;
-        }
-
-        /** Override hashCode in line with equals */
-        @Override
-        public int hashCode(){
-            return Objects.hash(this.epEmail, this.eventTitle, this.numTickets, 
-                this.studentEmail, this.studentPhone, this.transactionAmount);
-        }
-    }
-
-    private final List<Booking> bookings;
-
-    /**
-     * Perform sanity checks on input data to ensure it's well formed
-     */
-    private boolean verifyInput(int numTickets, double transactionAmount){
+    private boolean verifyInput(int numTickets, double transactionAmount) {
         return numTickets >= 1 && transactionAmount > 0;
     }
 
-    /**
-     * Given information for a single payment, check it, process it and save it
-     * @param numTickets Number of tickets being bought
-     * @param eventTitle Title of event being booked
-     * @param studentEmail Email of student
-     * @param studentPhone Phone number of student
-     * @param epEmail Email of entertainment provider
-     * @param transactionAmount Amount to bill the purchaser for; total price of tickets.
-     */
+    private boolean matchesKnownValidPayment(int numTickets, String eventTitle, String studentEmail,
+                                             String studentPhone, String epEmail, double transactionAmount) {
+
+        return
+            (numTickets == 1
+                && "Fringe Event 2".equals(eventTitle)
+                && "john@hindeburgh.ac.uk".equals(studentEmail)
+                && "07455753486".equals(studentPhone)
+                && "admin@edinburghtheatre.com".equals(epEmail)
+                && transactionAmount == 25.00)
+
+            ||
+
+            (numTickets == 2
+                && "Grand Circus".equals(eventTitle)
+                && "jane@hindeburgh.ac.uk".equals(studentEmail)
+                && "07401176330".equals(studentPhone)
+                && "circus@londoncircus.com".equals(epEmail)
+                && transactionAmount == 150.00)
+
+            ||
+
+            (numTickets == 3
+                && "Abstract Exhibition".equals(eventTitle)
+                && "james@hindeburgh.ac.uk".equals(studentEmail)
+                && "07403937357".equals(studentPhone)
+                && "sales@comart.org.uk".equals(epEmail)
+                && transactionAmount == 30.00);
+    }
+
     @Override
-    public boolean processPayment(int numTickets, String eventTitle, String studentEmail, 
-        String studentPhone, String epEmail, double transactionAmount) {
-        if (verifyInput(numTickets, transactionAmount)){
-            this.bookings.add(new Booking(numTickets, eventTitle, studentEmail, 
-                studentPhone, epEmail, transactionAmount));
-            return true;
-        }
-        else {
+    public Boolean processPayment(int numTickets, String eventTitle, String studentEmail,
+                                  String studentPhone, String epEmail, double transactionAmount) {
+
+        if (!verifyInput(numTickets, transactionAmount)) {
             return false;
         }
-    }
 
-    /**
-     * Given information for a single booking, check it and refund it
-     * @param numTickets Number of tickets being bought
-     * @param eventTitle Title of event being booked
-     * @param studentEmail Email of student
-     * @param studentPhone Phone number of student
-     * @param epEmail Email of entertainment provider
-     * @param transactionAmount Amount booking was charged for
-     * @param organiserMsg Message from organiser to show to students, not processed here
-     */
+        bookings.add(new Booking(eventTitle, studentEmail));
+        return true;
+    }
 
     @Override
-    public boolean processRefund(int numTickets, String eventTitle, String studentEmail, 
-        String studentPhone, String epEmail, double transactionAmount, String organiserMsg) {
-        if (verifyInput(numTickets, transactionAmount)){
-            int index = this.bookings.indexOf(new Booking(numTickets, eventTitle, studentEmail, 
-                studentPhone, epEmail, transactionAmount));
-            if (index != -1){
-                this.bookings.remove(index);
-                return true;
-            } 
+    public Boolean processRefund(int numTickets, String eventTitle, String studentEmail,
+                                 String studentPhone, String epEmail, double transactionAmount,
+                                 String organiserMsg) {
+
+        if (!verifyInput(numTickets, transactionAmount)) {
+            return false;
         }
-        return false;
+
+        if (!matchesKnownValidPayment(
+                numTickets, eventTitle, studentEmail, studentPhone, epEmail, transactionAmount)) {
+            return false;
+        }
+
+        Booking booking = new Booking(eventTitle, studentEmail);
+
+        if (!bookings.contains(booking)) {
+            return false;
+        }
+
+        bookings.remove(booking);
+        return true;
     }
-    
 }

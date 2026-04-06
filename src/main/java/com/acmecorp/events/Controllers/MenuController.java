@@ -32,7 +32,7 @@ public class MenuController extends Controller {
         SEARCH_FOR_PERFORMANCES,
         VIEW_PERFORMANCE,
         CREATE_EVENT,
-        CANCEL_PERFORMANCE       
+        CANCEL_PERFORMANCE
     }
 
     enum AdminMenuOptions {
@@ -42,112 +42,159 @@ public class MenuController extends Controller {
         SPONSOR_PERFORMANCE
     }
 
-    public MenuController(UserController userController, BookingController bookingController,
-        EventPerformanceController eventPerformanceController, View view, User currentUser) {
-        super(view, null);
-        this.currentUser = currentUser;
-
-        //set sub-controllers
+    public MenuController(UserController userController,
+                          BookingController bookingController,
+                          EventPerformanceController eventPerformanceController,
+                          View view,
+                          User currentUser) {
+        super(view, currentUser);
         this.userController = userController;
         this.bookingController = bookingController;
         this.eventPerformanceController = eventPerformanceController;
     }
 
-    /**
-     * Function to parse and display a EnumSet menu and get the user's input.
-     * Loops until a valid response is given. Returns an int which corresponds to
-     * the index of the constant (menu option)'s index in the enum passed.
-     * @param menu Ordered collection (ideally EnumSet of enum) of menu options.
-     * @return Integer corresponding to chosen option from input menu enum.
-     */
     @Override
-    public <T> int selectFromMenu(Collection<T> menu, String item){
-        int inputNumber = -1; //initalise the inputNumber as -1 to start the loop
-        while (!(inputNumber >= 0 && inputNumber <= menu.size())){
-            //pretty print with counter
-            String fullMenu = "Menu:\n";
+    public <T> int selectFromMenu(Collection<T> menu, String item) {
+        int inputNumber = -1;
+
+        while (!(inputNumber >= 0 && inputNumber <= menu.size())) {
+
+            StringBuilder fullMenu = new StringBuilder("Menu:\n");
             int i = 1;
-            for (T t : menu){
+
+            for (T t : menu) {
                 String menuOption = t.toString().replace("_", " ");
-                fullMenu = fullMenu.concat(String.format("%d. %s\n", i, menuOption));
+                fullMenu.append(i)
+                        .append(". ")
+                        .append(menuOption)
+                        .append("\n");
                 i++;
             }
-            //get input and return
+
             String input = this.view.getInput(
-                String.format("%sPlease enter the number corresponding to the action you wish to take, or enter 0 to exit", fullMenu));
+                fullMenu + "Please enter the number corresponding to the action you wish to take, or enter 0 to exit"
+            );
+
+            if (input == null) {
+                this.view.displayError(
+                    String.format("Input not recognised, please enter a number from 0 to %d.", menu.size())
+                );
+                continue;
+            }
+
             try {
-                inputNumber = Integer.parseInt(input);
+                inputNumber = Integer.parseInt(input.trim());
             } catch (NumberFormatException e) {
                 this.view.displayError(
                     String.format("Input not recognised, please enter a number from 0 to %d.", menu.size())
                 );
             }
         }
+
         return inputNumber - 1;
     }
 
-    /**
-     * Action called from mainMenu loop to synchronise userController.currentUser across all controllers.
-     */
-    private void synchroniseUserFromUserController(){
-        this.currentUser = userController.currentUser;
+    private void synchroniseUserFromUserController() {
+        this.currentUser = userController.getCurrentUser();
         this.bookingController.setCurrentUser(this.currentUser);
         this.eventPerformanceController.setCurrentUser(this.currentUser);
     }
 
-    /**
-     * Main application loop of the program, runs until exit is requested.
-     */
-    public void mainMenu(){
+    public void mainMenu() {
+
         boolean run = true;
-        int selectionIndex = -1;
-        //main loop
-        while (run){
-            //set and display correct menu, and then switch over menu to run correct action
-            if (this.checkCurrentUserIsStudent()){
+
+        while (run) {
+
+            int selectionIndex = -1;
+
+            if (this.checkCurrentUserIsStudent()) {
+
                 selectionIndex = this.selectFromMenu(EnumSet.allOf(StudentMenuOptions.class), "");
-                if (selectionIndex != -1){
-                    switch (StudentMenuOptions.values()[selectionIndex]){
-                        case LOGOUT -> {
-                            this.userController.logout();
-                            this.synchroniseUserFromUserController();
-                        }
+
+                if (selectionIndex != -1) {
+                    switch (StudentMenuOptions.values()[selectionIndex]) {
+
+                        case LOGOUT:
+                            userController.logout();
+                            synchroniseUserFromUserController();
+                            break;
+
+                        case REVIEW_PERFORMANCE:
+                            eventPerformanceController.reviewPerformance();
+                            break;
+
+                        case BOOK_EVENT:
+                            bookingController.bookEvent();
+                            break;
+
+                        case CANCEL_BOOKING:
+                            bookingController.cancelBooking();
+                            break;
+
+                        default:
+                            view.displayError("Feature not implemented yet.");
                     }
                 }
-            } else if (this.checkCurrentUserIsEntertainmentProvider()){
+
+            } else if (this.checkCurrentUserIsEntertainmentProvider()) {
+
                 selectionIndex = this.selectFromMenu(EnumSet.allOf(EPMenuOptions.class), "");
-                if (selectionIndex != -1){
-                    switch (EPMenuOptions.values()[selectionIndex]){
-                        case LOGOUT -> {
-                            this.userController.logout();
-                            this.synchroniseUserFromUserController();
-                        }
+
+                if (selectionIndex != -1) {
+                    switch (EPMenuOptions.values()[selectionIndex]) {
+
+                        case LOGOUT:
+                            userController.logout();
+                            synchroniseUserFromUserController();
+                            break;
+
+                        default:
+                            view.displayError("Feature not implemented yet.");
                     }
                 }
-            } else if (this.checkCurrentUserIsAdmin()){
+
+            } else if (this.checkCurrentUserIsAdmin()) {
+
                 selectionIndex = this.selectFromMenu(EnumSet.allOf(AdminMenuOptions.class), "");
-                if (selectionIndex != -1){
-                    switch (AdminMenuOptions.values()[selectionIndex]){
-                        case LOGOUT -> {
-                            this.userController.logout();
-                            this.synchroniseUserFromUserController();
-                        }
+
+                if (selectionIndex != -1) {
+                    switch (AdminMenuOptions.values()[selectionIndex]) {
+
+                        case LOGOUT:
+                            userController.logout();
+                            synchroniseUserFromUserController();
+                            break;
+
+                        case SPONSOR_PERFORMANCE:
+                            eventPerformanceController.sponsorPerformance();
+                            break;
+
+                        default:
+                            view.displayError("Feature not implemented yet.");
                     }
                 }
-            } else if (this.checkCurrentUserIsGuest()){
+
+            } else if (this.checkCurrentUserIsGuest()) {
+
                 selectionIndex = this.selectFromMenu(EnumSet.allOf(GuestMenuOptions.class), "");
-                if (selectionIndex != -1){
-                    switch (GuestMenuOptions.values()[selectionIndex]){
-                        case LOGIN -> {
-                            this.userController.login();
-                            this.synchroniseUserFromUserController();
-                        }
-                        case REGISTER_EP -> this.userController.registerEntertainmentProvider();
+
+                if (selectionIndex != -1) {
+                    switch (GuestMenuOptions.values()[selectionIndex]) {
+
+                        case LOGIN:
+                            userController.login();
+                            synchroniseUserFromUserController();
+                            break;
+
+                        case REGISTER_EP:
+                            userController.registerEntertainmentProvider();
+                            break;
                     }
                 }
-            } 
-            //if exit was requested, set the run variable to false
-            if (selectionIndex == -1){
+            }
+
+            if (selectionIndex == -1) {
                 run = false;
             }
         }

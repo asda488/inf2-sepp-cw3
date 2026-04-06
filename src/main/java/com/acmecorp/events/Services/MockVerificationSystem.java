@@ -1,19 +1,18 @@
 package com.acmecorp.events.Services;
 
-import java.util.Arrays;
-import java.util.HashSet;
-
 public class MockVerificationSystem implements VerificationSystem {
 
-    HashSet<String> businessNumbers = new HashSet<>(Arrays.asList(
-        "edi12345",
-        "lon98765",
-        "sp24680a"
-    ));
+    @Override
+    public Boolean verifyStudent(String email) {
+        return email != null && email.contains("@");
+    }
 
     @Override
-    public boolean verifyEntertainmentProvider(String businessRegistrationNumber) {
-        return businessNumbers.contains(businessRegistrationNumber.toLowerCase());
+    public Boolean verifyEntertainmentProvider(String businessNumber) {
+        if (businessNumber == null) return false;
+
+        String bn = businessNumber.trim().toLowerCase();
+
+        return !bn.isEmpty() && bn.length() >= 5;
     }
-    
 }

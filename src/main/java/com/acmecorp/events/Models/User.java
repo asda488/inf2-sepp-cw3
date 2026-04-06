@@ -1,11 +1,12 @@
 package com.acmecorp.events.Models;
 
 public abstract class User {
+
     private String email;
     private String password;
 
     public User(String email, String password) {
-        this.email = email;
+        this.email = email != null ? email.toLowerCase().trim() : null;
         this.password = password;
     }
 
@@ -14,7 +15,7 @@ public abstract class User {
     }
 
     public void setEmail(String email) {
-        this.email = email;
+        this.email = email != null ? email.toLowerCase().trim() : null;
     }
 
     public String getPassword() {
@@ -23,5 +24,5 @@ public abstract class User {
 
     public void setPassword(String password) {
         this.password = password;
-    }   
+    }
 }

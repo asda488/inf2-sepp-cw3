@@ -1,13 +1,15 @@
 package com.acmecorp.events.Models;
 
 public class EntertainmentProvider extends User {
+
     private String orgName;
     private String businessNumber;
     private String name;
     private String description;
 
-    public EntertainmentProvider(String email, String password, 
-        String businessNumber, String description, String name, String orgName) {
+    public EntertainmentProvider(String email, String password,
+                                 String businessNumber, String description,
+                                 String name, String orgName) {
         super(email, password);
         this.businessNumber = businessNumber;
         this.description = description;
