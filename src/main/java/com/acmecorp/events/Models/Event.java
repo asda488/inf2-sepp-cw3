@@ -75,10 +75,10 @@ public class Event {
         throw new IllegalArgumentException("Performance with ID " + performanceID + " not found");
     }
 
-    public Collection<String> getInfoForPerformancesOnDate(LocalDateTime searchDateTime) {
-        private List<String> performancesOnDate;
+    public Collection<String> getInfoForPerformancesOnDate(LocalDate searchDate) {
+        List<String> performancesOnDate;
         for (Performance performance : performances) {
-            if (performance.getStartDateTime().toLocalDate().equals(searchDateTime.toLocalDate())) {
+            if (performance.getStartDateTime().toLocalDate().equals(searchDate)) {
                 performancesOnDate.add(performance.toString());
             }
         }
@@ -98,7 +98,12 @@ public class Event {
     }
 
     public boolean hasPerformancesAtSameTime(LocalDateTime startDateTime, LocalDateTime endDateTime) {
-        
+        for (Performance p : performances) {
+            if(p.getStartDateTime().isBefore(endDateTime) && p.getEndDateTime().isAfter(startDateTime)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public String toString() {

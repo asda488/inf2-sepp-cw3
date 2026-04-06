@@ -16,7 +16,7 @@ public class Performance () {
     private double ticketPrice;
     private boolean isSponsored;
     private double sponsoredAmount;
-    private Collection<int> reviewRatings;
+    private Collection<Integer> reviewRatings;
     private Collection<String> reviewComments;
     private PerformanceStatus status;
     private Event event;
