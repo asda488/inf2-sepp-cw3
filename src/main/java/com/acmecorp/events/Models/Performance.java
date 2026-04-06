@@ -72,12 +72,12 @@ public class Performance () {
         this.endDateTime = endDateTime;
     }
 
-    public Collection<String> getPerformersNames() {
-        return performersNames;
+    public Collection<String> getPerformerNames() {
+        return performerNames;
     }
 
-    public void setPerformersNames(Collection<String> performersNames) {
-        this.performersNames = performersNames;
+    public void setPerformerNames(Collection<String> performerNames) {
+        this.performerNames = performerNames;
     }
 
     public String getVenueAddress() {
@@ -140,7 +140,7 @@ public class Performance () {
         return isSponsored;
     }
 
-    public void setSponsored(boolean sponsored) {
+    public void setIsSponsored(boolean sponsored) {
         isSponsored = sponsored;
     }
 
@@ -210,10 +210,24 @@ public class Performance () {
     }
 
     public String getEventTitle() {
-        return event.getEventTitle();
+        return event.getTitle();
     }
 
     public boolean checkHasNotHappenedYet() {
         return this.endDateTime.isAfter(LocalDateTime.now());
+    }
+
+    public String toString() {
+        return ("Event = " + event.getTitle() + 
+        ", PerformanceID = " + performanceID + 
+        ", Start Date and Time = " + startDateTime + 
+        ", End Date and Time = " + endDateTime + 
+        ", Performers = " + performerNames + 
+        ", Price = " + ticketPrice + 
+        ", No. of Tickets = " + (numTicketsTotal-numTicketsSold) + 
+        ", Venue Address = " + venueAddress + 
+        ", Capacity = " + venueCapacity + 
+        ", Outdoors = " + venueIsOutdoors + 
+        ", Smoking = " + venueAllowsSmoking);
     }
 }

@@ -17,11 +17,11 @@ public class Event {
         this.organiser = organiser;
     }
 
-    public long getID() {
+    public long getEventID() {
         return eventID;
     }
 
-    public void setID(long eventID) {
+    public void setEventID(long eventID) {
         this.eventID = eventID;
     }
 
@@ -79,7 +79,7 @@ public class Event {
         private List<String> performancesOnDate;
         for (Performance performance : performances) {
             if (performance.getStartDateTime().toLocalDate().equals(searchDateTime.toLocalDate())) {
-                performancesOnDate.add(performance);
+                performancesOnDate.add(performance.toString());
             }
         }
         return performancesOnDate;
@@ -99,5 +99,9 @@ public class Event {
 
     public boolean hasPerformancesAtSameTime(LocalDateTime startDateTime, LocalDateTime endDateTime) {
         
+    }
+
+    public String toString() {
+        return ("EventID = " + eventID + ", Title = " + title + ", Type = " + type + "Ticketed = " + isTicketed);
     }
 }
