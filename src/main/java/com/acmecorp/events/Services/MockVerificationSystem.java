@@ -12,7 +12,7 @@ public class MockVerificationSystem implements VerificationSystem {
     ));
 
     @Override
-    public Boolean verifyEntertainmentProvider(String businessRegistrationNumber) {
+    public boolean verifyEntertainmentProvider(String businessRegistrationNumber) {
         return businessNumbers.contains(businessRegistrationNumber.toLowerCase());
     }
     

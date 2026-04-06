@@ -99,7 +99,7 @@ public class MenuController extends Controller {
      * Main application loop of the program, runs until exit is requested.
      */
     public void mainMenu(){
-        Boolean run = true;
+        boolean run = true;
         int selectionIndex = -1;
         //main loop
         while (run){

@@ -62,7 +62,7 @@ public class MockPaymentSystem implements PaymentSystem {
     /**
      * Perform sanity checks on input data to ensure it's well formed
      */
-    private Boolean verifyInput(int numTickets, double transactionAmount){
+    private boolean verifyInput(int numTickets, double transactionAmount){
         return numTickets >= 1 && transactionAmount > 0;
     }
 
@@ -76,7 +76,7 @@ public class MockPaymentSystem implements PaymentSystem {
      * @param transactionAmount Amount to bill the purchaser for; total price of tickets.
      */
     @Override
-    public Boolean processPayment(int numTickets, String eventTitle, String studentEmail, 
+    public boolean processPayment(int numTickets, String eventTitle, String studentEmail, 
         String studentPhone, String epEmail, double transactionAmount) {
         if (verifyInput(numTickets, transactionAmount)){
             this.bookings.add(new Booking(numTickets, eventTitle, studentEmail, 
@@ -100,7 +100,7 @@ public class MockPaymentSystem implements PaymentSystem {
      */
 
     @Override
-    public Boolean processRefund(int numTickets, String eventTitle, String studentEmail, 
+    public boolean processRefund(int numTickets, String eventTitle, String studentEmail, 
         String studentPhone, String epEmail, double transactionAmount, String organiserMsg) {
         if (verifyInput(numTickets, transactionAmount)){
             int index = this.bookings.indexOf(new Booking(numTickets, eventTitle, studentEmail, 

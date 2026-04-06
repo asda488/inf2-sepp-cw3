@@ -158,7 +158,7 @@ public class UserController extends Controller{
         }
     }
 
-    private Boolean EPAccountAlreadyExists(String email, String orgName, String businessNumber){
+    private boolean EPAccountAlreadyExists(String email, String orgName, String businessNumber){
         //firstly check if there is any type of account with the given email
         if (this.entertainmentProviders.containsKey(email)
             || this.adminStaffs.containsKey(email)
