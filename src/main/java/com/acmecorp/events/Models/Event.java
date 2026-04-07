@@ -116,6 +116,6 @@ public class Event {
     }
 
     public String toString() {
-        return ("EventID = " + eventID + ", Title = " + title + ", Type = " + type + "Ticketed = " + isTicketed);
+        return ("EventID = " + eventID + ", Title = " + title + ", Type = " + type + ", Ticketed = " + isTicketed);
     }
 }

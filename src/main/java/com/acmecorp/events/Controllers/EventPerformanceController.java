@@ -210,8 +210,19 @@ public class EventPerformanceController extends Controller{
             return;
         }
 
+        List<String> filteredPerformancesOnDate = new ArrayList<>();
+        List<String> preferences;
         if (checkCurrentUserIsStudent()) {
-            //currentUser.getPreferences();
+            preferences = currentUser.getPreferences();
+            for (String s : performancesOnDate) {
+                int indexStart = s.indexOf("Type = ");
+                int indexEnd = s.indexOf(", Ticketed");
+                String type = s.substring(indexStart+7, indexEnd);
+                if (preferences.contains(type)) {
+                    filteredPerformancesOnDate.add(s);
+                }
+            }
+            performancesOnDate = filteredPerformancesOnDate;
         }
 
         this.view.displayListofPerformances(performancesOnDate);
