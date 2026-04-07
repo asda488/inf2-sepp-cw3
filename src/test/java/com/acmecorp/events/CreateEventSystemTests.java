@@ -1,10 +1,22 @@
 package com.acmecorp.events;
 
+import com.acmecorp.events.Controllers.EventPerformanceController;
+import com.acmecorp.events.Models.EntertainmentProvider;
+import com.acmecorp.events.Models.Event;
+import com.acmecorp.events.Models.Student;
+import com.acmecorp.events.Models.User;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class CreateEventSystemTests extends SystemTestsBase {
+
+    @BeforeEach
+    void setUpUser() {
+        User ep = new EntertainmentProvider("ep@example.com", "password", "123456", "A music promoter", "John Smith", "Acme Events");
+        this.eventPerformanceController = new EventPerformanceController(textUserInterfaceMock, ep);
+    }
 
     @Test
     void shouldCreateEventSuccessfully() {
@@ -32,7 +44,8 @@ public class CreateEventSystemTests extends SystemTestsBase {
 
     @Test
     void shouldRejectNonEntertainmentProviderUser() {
-        when(currentUserMock.checkCurrentUserIsEntertainmentProvider()).thenReturn(false);
+        User student = new Student("student@example.com", "password", "Jane Smith", "07123456789");
+        this.eventPerformanceController = new EventPerformanceController(textUserInterfaceMock, student);
 
         Event event = eventPerformanceController.createEvent();
 
@@ -45,7 +58,6 @@ public class CreateEventSystemTests extends SystemTestsBase {
 
     @Test
     void shouldRejectEmptyEventTitle() {
-        when(currentUserMock.checkCurrentUserIsEntertainmentProvider()).thenReturn(true);
         when(textUserInterfaceMock.getInput(anyString()))
             .thenReturn("") // invalid
             .thenReturn("Scotland vs England Fan Zone") // valid
@@ -68,7 +80,6 @@ public class CreateEventSystemTests extends SystemTestsBase {
 
     @Test
     void shouldRejectInvalidEventType() {
-        when(currentUserMock.checkCurrentUserIsEntertainmentProvider()).thenReturn(true);
         when(textUserInterfaceMock.getInput(anyString()))
             .thenReturn("Film Society Premiere") 
             .thenReturn("Screening") // invalid
@@ -93,7 +104,6 @@ public class CreateEventSystemTests extends SystemTestsBase {
 
     @Test
     void shouldRejectNoOfPerformances() {
-        when(currentUserMock.checkCurrentUserIsEntertainmentProvider()).thenReturn(true);
         when(textUserInterfaceMock.getInput(anyString()))
             .thenReturn("Pantomime") 
             .thenReturn("Theatre")
@@ -118,7 +128,6 @@ public class CreateEventSystemTests extends SystemTestsBase {
 
     @Test
     void shouldRejectInvalidDate() {
-        when(currentUserMock.checkCurrentUserIsEntertainmentProvider()).thenReturn(true);
         when(textUserInterfaceMock.getInput(anyString()))
             .thenReturn("Dance Showcase") 
             .thenReturn("Dance")
@@ -142,7 +151,6 @@ public class CreateEventSystemTests extends SystemTestsBase {
 
     @Test
     void shouldRejectEndBeforeStart() {
-        when(currentUserMock.checkCurrentUserIsEntertainmentProvider()).thenReturn(true);
         when(textUserInterfaceMock.getInput(anyString()))
             .thenReturn("Auditions") 
             .thenReturn("Theatre")
@@ -166,7 +174,6 @@ public class CreateEventSystemTests extends SystemTestsBase {
 
     @Test
     void shouldRejectOverlappingPerformances() {
-        when(currentUserMock.checkCurrentUserIsEntertainmentProvider()).thenReturn(true);
         when(textUserInterfaceMock.getInput(anyString()))
             .thenReturn("Premier League") 
             .thenReturn("Sports")
@@ -197,7 +204,6 @@ public class CreateEventSystemTests extends SystemTestsBase {
 
     @Test
     void shouldRejectPerformerNames() {
-        when(currentUserMock.checkCurrentUserIsEntertainmentProvider()).thenReturn(true);
         when(textUserInterfaceMock.getInput(anyString()))
             .thenReturn("Edinburgh Orchestra Charity Fundraiser") 
             .thenReturn("Music")
@@ -222,7 +228,6 @@ public class CreateEventSystemTests extends SystemTestsBase {
 
     @Test
     void shouldRejectTicketPrice() {
-        when(currentUserMock.checkCurrentUserIsEntertainmentProvider()).thenReturn(true);
         when(textUserInterfaceMock.getInput(anyString()))
             .thenReturn("Singing in the Rain") 
             .thenReturn("Theatre")
@@ -247,7 +252,6 @@ public class CreateEventSystemTests extends SystemTestsBase {
 
     @Test
     void shouldRejectNoOfTickets() {
-        when(currentUserMock.checkCurrentUserIsEntertainmentProvider()).thenReturn(true);
         when(textUserInterfaceMock.getInput(anyString()))
             .thenReturn("Classic Film Screening") 
             .thenReturn("Movie")
@@ -272,7 +276,6 @@ public class CreateEventSystemTests extends SystemTestsBase {
 
     @Test
     void shouldRejectVenueAddress() {
-        when(currentUserMock.checkCurrentUserIsEntertainmentProvider()).thenReturn(true);
         when(textUserInterfaceMock.getInput(anyString()))
             .thenReturn("Varsity Game") 
             .thenReturn("Sports")
@@ -295,7 +298,6 @@ public class CreateEventSystemTests extends SystemTestsBase {
 
     @Test
     void shouldRejectVenueCapacity() {
-        when(currentUserMock.checkCurrentUserIsEntertainmentProvider()).thenReturn(true);
         when(textUserInterfaceMock.getInput(anyString()))
             .thenReturn("Dance Competition") 
             .thenReturn("Dance")
@@ -318,7 +320,6 @@ public class CreateEventSystemTests extends SystemTestsBase {
 
     @Test
     void shouldRejectOutdoorOption() {
-        when(currentUserMock.checkCurrentUserIsEntertainmentProvider()).thenReturn(true);
         when(textUserInterfaceMock.getInput(anyString()))
             .thenReturn("World Cup Fan Zone") 
             .thenReturn("Sports")
@@ -341,7 +342,6 @@ public class CreateEventSystemTests extends SystemTestsBase {
 
     @Test
     void shouldRejectSmokingOption() {
-        when(currentUserMock.checkCurrentUserIsEntertainmentProvider()).thenReturn(true);
         when(textUserInterfaceMock.getInput(anyString()))
             .thenReturn("Band World Tour") 
             .thenReturn("Music")

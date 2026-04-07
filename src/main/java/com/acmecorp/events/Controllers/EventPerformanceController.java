@@ -15,7 +15,7 @@ import com.acmecorp.events.Views.View;
 public class EventPerformanceController extends Controller{
     private long nextEventID;
     private long nextPerformanceID;
-    private List<Event> events;
+    public List<Event> events;
 
     public EventPerformanceController(View view, User currentUser) {
         super(view, currentUser);
@@ -64,7 +64,10 @@ public class EventPerformanceController extends Controller{
         while (true) {
             try {
                 noOfPerformances = Integer.parseInt(this.view.getInput("Enter number of performances: "));
-                break; // valid input causes loop exit
+                if (noOfPerformances > 0) {
+                    break; // valid input causes loop exit
+                }
+                this.view.displayError("Invalid number, try again.");
             } catch (NumberFormatException e) {
                 this.view.displayError("Invalid number, try again.");
             }
@@ -82,8 +85,8 @@ public class EventPerformanceController extends Controller{
             LocalDateTime endDateTime;
             while (true) {
                 try {
-                    startDateTime = LocalDateTime.parse("Enter the start date and time (yyyy-MM-ddTHH:mm): ");
-                    endDateTime = LocalDateTime.parse("Enter the end date and time (yyyy-MM-ddTHH:mm): ");
+                    startDateTime = LocalDateTime.parse(this.view.getInput("Enter the start date and time (yyyy-MM-ddTHH:mm): "));
+                    endDateTime = LocalDateTime.parse(this.view.getInput("Enter the end date and time (yyyy-MM-ddTHH:mm): "));
                     if (endDateTime.isAfter(startDateTime) && !event.hasPerformancesAtSameTime(startDateTime, endDateTime)) {
                         break;
                     } else if (!endDateTime.isAfter(startDateTime)) {
@@ -121,8 +124,9 @@ public class EventPerformanceController extends Controller{
                     try {
                         numTickets = Integer.parseInt(this.view.getInput("Enter the remaining number of tickets: "));
                         if (numTickets > 0) {
-                         break; //valid input causes loop exit
+                            break; //valid input causes loop exit
                         }
+                        this.view.displayError("Invalid number, try again.");
                     } catch (NumberFormatException e) {
                         this.view.displayError("Invalid number, try again.");
                     }
@@ -187,6 +191,7 @@ public class EventPerformanceController extends Controller{
                 searchDate = LocalDate.parse(this.view.getInput("Enter search date for performances (yyyy-MM-dd): "));
             } catch (DateTimeParseException e) {
                 this.view.displayError("Invalid date, try again.");
+                continue;
             }
             if (!searchDate.isBefore(LocalDate.now())) {
                 break; // valid input causes loop exit
@@ -220,7 +225,7 @@ public class EventPerformanceController extends Controller{
                 selectedPerformanceID = Long.parseLong(this.view.getInput("Enter PerformanceID: "));
                 break; // valid input exits loop
             } catch (NumberFormatException e) {
-                this.view.displayError("Invalid ID, try again");
+                this.view.displayError("Invalid ID, try again.");
             }
         }
 

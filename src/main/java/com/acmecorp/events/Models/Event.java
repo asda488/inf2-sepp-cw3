@@ -67,6 +67,7 @@ public class Event {
 
     public Performance createPerformance(Event event, long performanceID, LocalDateTime startDateTime, LocalDateTime endDateTime, Collection<String> performerNames, double ticketPrice, int numTickets, String venueAddress, int venueCapacity, boolean venueIsOutdoors, boolean venueAllowsSmoking) {
         Performance performance = new Performance(event, performanceID, startDateTime, endDateTime, performerNames, ticketPrice, numTickets, venueAddress, venueCapacity, venueIsOutdoors, venueAllowsSmoking);
+        this.performances.add(performance);
         return performance;
     }
 
@@ -89,7 +90,7 @@ public class Event {
         return performancesOnDate;
     }
 
-    private EntertainmentProvider getOrganiser() {
+    public EntertainmentProvider getOrganiser() {
         return this.organiser;
     }
 
