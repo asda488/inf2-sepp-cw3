@@ -9,7 +9,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.acmecorp.events.Models.*;
+import com.acmecorp.events.Models.EntertainmentProvider;
+import com.acmecorp.events.Models.Event;
+import com.acmecorp.events.Models.EventType;
+import com.acmecorp.events.Models.Performance;
+import com.acmecorp.events.Models.User;
 import com.acmecorp.events.Views.View;
 
 public class EventPerformanceController extends Controller{
@@ -79,13 +83,12 @@ public class EventPerformanceController extends Controller{
         nextEventID++;
 
         for (int i = 1; i <= noOfPerformances; i++) {
-            System.out.println("Performance " + i);
-
             LocalDateTime startDateTime;
             LocalDateTime endDateTime;
             while (true) {
                 try {
-                    startDateTime = LocalDateTime.parse(this.view.getInput("Enter the start date and time (yyyy-MM-ddTHH:mm): "));
+                    startDateTime = LocalDateTime.parse(this.view.getInput("Performance " + i + 
+                        "\nEnter the start date and time (yyyy-MM-ddTHH:mm): "));
                     endDateTime = LocalDateTime.parse(this.view.getInput("Enter the end date and time (yyyy-MM-ddTHH:mm): "));
                     if (endDateTime.isAfter(startDateTime) && !event.hasPerformancesAtSameTime(startDateTime, endDateTime)) {
                         break;
