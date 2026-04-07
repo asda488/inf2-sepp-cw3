@@ -44,18 +44,35 @@ public class TextUserInterface implements View {
         System.out.println(String.format("[ERROR] %s", errorMessage));
     }
 
+    /**
+     * Display a list of performances to the user
+     * @param listOfPerformanceInfo List of performance information as strings
+     */
     @Override
     public void displayListofPerformances(Collection<String> listOfPerformanceInfo){
-
+        System.out.println("List of performances:");
+        int i = 1;
+        for (String s : listOfPerformanceInfo){
+            System.out.println(String.format("%d: %s", i, listOfPerformanceInfo));
+            i++;
+        }
     }
 
+    /**
+     * Display a specific performance to the user
+     * @param performanceInfo Performance information as string
+     */
     @Override
     public void displaySpecificPerformance(String performanceInfo){
-
+        System.out.println(performanceInfo);
     }
-    
+
+    /**
+     * Display a specific booking record to the user
+     * @param bookingRecord Booking record as a string.
+     */
     @Override
     public void displayBookingRecord(String bookingRecord){
-        
+        System.out.println(bookingRecord);
     }
 }

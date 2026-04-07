@@ -22,25 +22,25 @@ public abstract class Controller {
     /**
      * Check if the current Controller user is a guest/logged out
      */
-    protected Boolean checkCurrentUserIsGuest(){
+    protected boolean checkCurrentUserIsGuest(){
         return currentUser == null; 
     };
     /**
      * Check if the current Controller user is an admin
      */
-    protected Boolean checkCurrentUserIsAdmin(){
+    protected boolean checkCurrentUserIsAdmin(){
         return currentUser instanceof AdminStaff;
     };
     /**
      * Check if the current Controller user is a student
      */
-    protected Boolean checkCurrentUserIsStudent(){
+    protected boolean checkCurrentUserIsStudent(){
         return currentUser instanceof Student;
     };
     /**
      * Check if the current Controller user is an EP
      */
-    protected Boolean checkCurrentUserIsEntertainmentProvider(){
+    protected boolean checkCurrentUserIsEntertainmentProvider(){
         return currentUser instanceof EntertainmentProvider;
     };
 
