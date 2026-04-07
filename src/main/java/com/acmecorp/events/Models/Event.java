@@ -1,5 +1,13 @@
 package com.acmecorp.events.Models;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import com.acmecorp.events.Models.EventType;
+
 public class Event {
     private long eventID;
     private String title;
@@ -57,12 +65,9 @@ public class Event {
         this.performances = performances;
     }
 
-    public EntertainmentProvider getOrganiser() {
-        return organiser;
-    }
-
     public Performance createPerformance(Event event, long performanceID, LocalDateTime startDateTime, LocalDateTime endDateTime, Collection<String> performerNames, double ticketPrice, int numTickets, String venueAddress, int venueCapacity, boolean venueIsOutdoors, boolean venueAllowsSmoking) {
         Performance performance = new Performance(event, performanceID, startDateTime, endDateTime, performerNames, ticketPrice, numTickets, venueAddress, venueCapacity, venueIsOutdoors, venueAllowsSmoking);
+        this.performances.add(performance);
         return performance;
     }
 
@@ -75,14 +80,18 @@ public class Event {
         throw new IllegalArgumentException("Performance with ID " + performanceID + " not found");
     }
 
-    public Collection<String> getInfoForPerformancesOnDate(LocalDateTime searchDateTime) {
-        private List<String> performancesOnDate;
+    public Collection<String> getInfoForPerformancesOnDate(LocalDate searchDate) {
+        List<String> performancesOnDate = new ArrayList<>();
         for (Performance performance : performances) {
-            if (performance.getStartDateTime().toLocalDate().equals(searchDateTime.toLocalDate())) {
+            if (performance.getStartDateTime().toLocalDate().equals(searchDate)) {
                 performancesOnDate.add(performance.toString());
             }
         }
         return performancesOnDate;
+    }
+
+    public EntertainmentProvider getOrganiser() {
+        return this.organiser;
     }
 
     private String getOrganiserName() {
@@ -93,12 +102,17 @@ public class Event {
         return this.organiser.getEmail();
     }
     
-    public double getAverageRatingOfPerformances() {
+    //public double getAverageRatingOfPerformances() {
 
-    }
+    //}
 
     public boolean hasPerformancesAtSameTime(LocalDateTime startDateTime, LocalDateTime endDateTime) {
-        
+        for (Performance p : performances) {
+            if(p.getStartDateTime().isBefore(endDateTime) && p.getEndDateTime().isAfter(startDateTime)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public String toString() {

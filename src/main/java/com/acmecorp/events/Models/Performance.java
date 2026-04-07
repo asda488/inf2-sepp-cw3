@@ -1,12 +1,17 @@
 package com.acmecorp.events.Models;
-import java.util.LocalDateTime;
+import com.acmecorp.events.Services.MockPaymentSystem;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+
 import static java.lang.Math.*;
 
-public class Performance () {
+public class Performance {
     private long performanceID;
     private LocalDateTime startDateTime;
     private LocalDateTime endDateTime;
-    private Collection<String> performersNames;
+    private Collection<String> performerNames;
     private String venueAddress;
     private int venueCapacity;
     private boolean venueIsOutdoors;
@@ -16,11 +21,11 @@ public class Performance () {
     private double ticketPrice;
     private boolean isSponsored;
     private double sponsoredAmount;
-    private Collection<int> reviewRatings;
+    private Collection<Integer> reviewRatings;
     private Collection<String> reviewComments;
     private PerformanceStatus status;
     private Event event;
-    private Collection<Booking> bookings;
+    private Collection<MockPaymentSystem.Booking> bookings;
     
     enum PerformanceStatus {
         ACTIVE,
@@ -44,7 +49,7 @@ public class Performance () {
         this.sponsoredAmount = 0;
         this.reviewRatings = new ArrayList<>();
         this.reviewComments = new ArrayList<>();
-        this.performanceStatus = PerformanceStatus.ACTIVE;
+        this.status = PerformanceStatus.ACTIVE;
         this.bookings = new ArrayList<>();
     }
 
@@ -180,7 +185,7 @@ public class Performance () {
         return event;
     }
 
-    public Collection<Booking> getBookings() {
+    public Collection<MockPaymentSystem.Booking> getBookings() {
         return bookings;
     }
 
@@ -205,8 +210,8 @@ public class Performance () {
     }
 
     public String getOrganiserEmail() {
-        organiser = event.getOrganiser();
-        return organiser.getEmail();
+        EntertainmentProvider organiser = event.getOrganiser();
+        return organiser.getOrgEmail();
     }
 
     public String getEventTitle() {
