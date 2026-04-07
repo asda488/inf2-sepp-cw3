@@ -3,6 +3,8 @@ package com.acmecorp.events;
 import com.acmecorp.events.Controllers.EventPerformanceController;
 import com.acmecorp.events.Models.EntertainmentProvider;
 import com.acmecorp.events.Models.User;
+import com.acmecorp.events.Services.MockPaymentSystem;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.*;
@@ -14,7 +16,7 @@ public class SearchPerformancesSystemTests extends SystemTestsBase {
     @BeforeEach
     void setUpPerformance() {
         User ep = new EntertainmentProvider("ep@example.com", "password", "123456", "A music promoter", "John Smith", "Acme Events");
-        this.eventPerformanceController = new EventPerformanceController(textUserInterfaceMock, ep);
+        this.eventPerformanceController = new EventPerformanceController(textUserInterfaceMock, ep, new MockPaymentSystem());
         when(textUserInterfaceMock.getInput(anyString()))
                 .thenReturn("Rock Concert")
                 .thenReturn("Music")

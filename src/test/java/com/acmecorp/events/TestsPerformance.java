@@ -18,6 +18,7 @@ import org.junit.jupiter.params.provider.FieldSource;
 import com.acmecorp.events.Models.Booking;
 import com.acmecorp.events.Models.EntertainmentProvider;
 import com.acmecorp.events.Models.Event;
+import com.acmecorp.events.Models.EventType;
 import com.acmecorp.events.Models.Performance;
 import com.acmecorp.events.Models.Student;
 
@@ -29,7 +30,7 @@ public class TestsPerformance {
     void initNewPerformance(){
         EntertainmentProvider ep = new EntertainmentProvider("test@test.com", "test", "1", 
             "Test", "Test Test", "Test Inc.");
-        Event event = new Event(1l, "Test Event", Event.EventType.DANCE, true, new ArrayList<>(), ep);
+        Event event = new Event(1l, "Test Event", EventType.DANCE, true, new ArrayList<>(), ep);
         this.performance = new Performance(
             event, 1, LocalDateTime.of(2026, 01, 01, 01, 01), LocalDateTime.of(2026, 01, 02, 01, 01),
             Arrays.asList(new String[]{"Test A", "Test B"}), 20.00, 400, "Test Address",
@@ -51,7 +52,7 @@ public class TestsPerformance {
      * Check if ticketed event is ticketed
      */
     @Test
-    void checkIfEventIsTicktedTrueTest(){
+    void checkIfEventIsTicketedTrueTest(){
         assertTrue((this.performance.getEvent().getTicketed()),
         "Ticketed event was erroneously marked as unticketed.");
     }
@@ -60,7 +61,7 @@ public class TestsPerformance {
      * Check if unticked event is unticketed
      */
     @Test
-    void checkIfEventIsTicktedFalseTest(){
+    void checkIfEventIsTicketedFalseTest(){
         this.performance.getEvent().setTicketed(false);
         assertFalse((this.performance.getEvent().getTicketed()),
         "Unticketed event was erroneously marked as ticketed");

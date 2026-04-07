@@ -1,5 +1,6 @@
 package com.acmecorp.events.Services;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -7,6 +8,10 @@ public class MockPaymentSystem implements PaymentSystem {
 
     public MockPaymentSystem(List<Booking> bookings) {
         this.bookings = bookings;
+    }
+
+    public MockPaymentSystem() {
+        this.bookings = new ArrayList<>();
     }
 
     /**

@@ -1,8 +1,13 @@
 package com.acmecorp.events.Models;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Student extends User{
     private String name;
     private String phoneNumber;
+    private StudentPreferences pref;
+    private List<Booking> bookList;
 
     /**
      * Constructor for student
@@ -15,6 +20,8 @@ public class Student extends User{
         super(email, password);
         this.name = name;
         this.phoneNumber = phoneNumber;
+        this.pref = new StudentPreferences();
+        this.bookList = new ArrayList<>();
     }
 
     public String getName() {
@@ -33,5 +40,15 @@ public class Student extends User{
         this.phoneNumber = phoneNumber;
     }
 
-    
+    public StudentPreferences getPreferences() {
+        return pref;
+    }
+
+    public void addBooking(Booking booking) {
+        this.bookList.add(booking);
+    }
+
+    public List<Booking> getBookings() {
+        return bookList;
+    }
 }

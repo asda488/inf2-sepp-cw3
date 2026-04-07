@@ -1,11 +1,8 @@
 package com.acmecorp.events.Models;
-import com.acmecorp.events.Services.MockPaymentSystem;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import static java.lang.Math.*;
 
 public class Performance {
     private long performanceID;
@@ -25,9 +22,9 @@ public class Performance {
     private Collection<String> reviewComments;
     private PerformanceStatus status;
     private Event event;
-    private Collection<MockPaymentSystem.Booking> bookings;
+    private Collection<Booking> bookings;
     
-    enum PerformanceStatus {
+    public static enum PerformanceStatus {
         ACTIVE,
         CANCELLED
     }
@@ -153,7 +150,8 @@ public class Performance {
         return sponsoredAmount;
     }
 
-    public void setSponsoredAmount(double sponsoredAmount) {
+    public void sponsor(double sponsoredAmount) {
+        this.isSponsored = sponsoredAmount != 0;
         this.sponsoredAmount = sponsoredAmount;
     }
 
@@ -185,8 +183,12 @@ public class Performance {
         return event;
     }
 
-    public Collection<MockPaymentSystem.Booking> getBookings() {
+    public Collection<Booking> getBookings() {
         return bookings;
+    }
+
+    public void addBooking(Booking b) { //custom setter
+        this.bookings.add(b);
     }
 
     public void cancel() {
@@ -203,7 +205,7 @@ public class Performance {
 
     public double getFinalTicketPrice() {
         if (isSponsored) {
-            return ticketPrice - Math.floor(sponsoredAmount/(numTicketsTotal-numTicketsSold)*100)/100;
+            return ticketPrice - sponsoredAmount;
         } else {
             return ticketPrice;
         }
@@ -219,7 +221,28 @@ public class Performance {
     }
 
     public boolean checkHasNotHappenedYet() {
-        return this.endDateTime.isAfter(LocalDateTime.now());
+        return this.startDateTime.isAfter(LocalDateTime.now());
+    }
+
+    /**
+     * Check if performance was created by EP
+     * @param email Email of EP
+     */
+    public boolean checkCreatedByEP(String email){
+        return this.event.getOrganiserEmail().equals(email);
+    }
+    
+    /**
+     * Check if there are any active bookings
+     */
+
+    public boolean hasActiveBookings(){
+        for (Booking b : this.bookings){
+            if (b.getStatus() == Booking.BookingStatus.ACTIVE){
+                return true;
+            }
+        }
+        return false;
     }
 
     public String toString() {

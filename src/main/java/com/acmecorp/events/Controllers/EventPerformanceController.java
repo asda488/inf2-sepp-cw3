@@ -9,19 +9,36 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.acmecorp.events.Models.*;
+import com.acmecorp.events.Models.Booking;
+import com.acmecorp.events.Models.EntertainmentProvider;
+import com.acmecorp.events.Models.Event;
+import com.acmecorp.events.Models.EventType;
+import com.acmecorp.events.Models.Performance;
+import com.acmecorp.events.Models.Student;
+import com.acmecorp.events.Models.User;
+import com.acmecorp.events.Services.PaymentSystem;
 import com.acmecorp.events.Views.View;
 
 public class EventPerformanceController extends Controller{
     private long nextEventID;
     private long nextPerformanceID;
+    private PaymentSystem paymentSystem;
     public List<Event> events;
 
-    public EventPerformanceController(View view, User currentUser) {
+    public EventPerformanceController(View view, User currentUser, PaymentSystem paymentSystem) {
         super(view, currentUser);
         this.nextEventID = 0;
         this.nextPerformanceID = 0;
         this.events = new ArrayList<>();
+        this.paymentSystem = paymentSystem;
+    }
+
+    public EventPerformanceController(View view, User currentUser, List<Event> events, PaymentSystem paymentSystem) {
+        super(view, currentUser);
+        this.nextEventID = 0;
+        this.nextPerformanceID = 0;
+        this.events = events;
+        this.paymentSystem = paymentSystem;
     }
 
     public Event createEvent() {
@@ -79,13 +96,12 @@ public class EventPerformanceController extends Controller{
         nextEventID++;
 
         for (int i = 1; i <= noOfPerformances; i++) {
-            System.out.println("Performance " + i);
-
             LocalDateTime startDateTime;
             LocalDateTime endDateTime;
             while (true) {
                 try {
-                    startDateTime = LocalDateTime.parse(this.view.getInput("Enter the start date and time (yyyy-MM-ddTHH:mm): "));
+                    startDateTime = LocalDateTime.parse(this.view.getInput("Performance " + i + 
+                        "\nEnter the start date and time (yyyy-MM-ddTHH:mm): "));
                     endDateTime = LocalDateTime.parse(this.view.getInput("Enter the end date and time (yyyy-MM-ddTHH:mm): "));
                     if (endDateTime.isAfter(startDateTime) && !event.hasPerformancesAtSameTime(startDateTime, endDateTime)) {
                         break;
@@ -213,16 +229,20 @@ public class EventPerformanceController extends Controller{
         List<String> filteredPerformancesOnDate = new ArrayList<>();
         List<String> preferences;
         if (checkCurrentUserIsStudent()) {
-            preferences = currentUser.getPreferences();
-            for (String s : performancesOnDate) {
-                int indexStart = s.indexOf("Type = ");
-                int indexEnd = s.indexOf(", Ticketed");
-                String type = s.substring(indexStart+7, indexEnd);
-                if (preferences.contains(type)) {
-                    filteredPerformancesOnDate.add(s);
+            List<String> filteredPerformancesOnDate = new ArrayList<>();
+            String preferences;
+            if (checkCurrentUserIsStudent()) {
+                preferences = ((Student)currentUser).getPreferences().toString();
+                for (String s : performancesOnDate) {
+                    int indexStart = s.indexOf("Type = ");
+                    int indexEnd = s.indexOf(", Ticketed");
+                    String type = s.substring(indexStart+7, indexEnd);
+                    if (preferences.contains(type)) {
+                        filteredPerformancesOnDate.add(s);
+                    }
                 }
+                performancesOnDate = filteredPerformancesOnDate;
             }
-            performancesOnDate = filteredPerformancesOnDate;
         }
 
         this.view.displayListofPerformances(performancesOnDate);
@@ -260,9 +280,71 @@ public class EventPerformanceController extends Controller{
         }
     }
 
-    private Event getEventByID(long eventID) {
-        for (Event e : events) {
-            if (eventID == e.getEventID()) {
+    public void cancelPerformance() {
+        assert this.checkCurrentUserIsEntertainmentProvider();
+        EntertainmentProvider ep = (EntertainmentProvider) this.currentUser;
+
+        Performance p = null;
+        while (p == null) {
+            long id = readLong("Enter ID of the performance to cancel");
+            p = getPerformanceByID(id);
+            if (p == null) {
+                this.view.displayError("Performance with given number does not exist.");
+                continue;
+            }
+            if (!p.checkCreatedByEP(ep.getEmail())) {
+                this.view.displayError("Performance was not created by the current entertainment provider.");
+                p = null;
+                continue;
+            }
+            if (p.getStatus() == Performance.PerformanceStatus.CANCELLED) {
+                this.view.displayError("Performance is already cancelled");
+                p = null;
+                continue;
+            }
+            if (!p.checkHasNotHappenedYet()) {
+                this.view.displayError("Performance has already happened.");
+                p = null;
+            }
+        }
+
+        String msg = "";
+        while (msg.isBlank()) {
+            msg = this.view.getInput("Enter a message for affected students")
+                .trim();
+            if (msg.isBlank()) {
+                this.view.displayError("Message cannot be empty.");
+            }
+        }
+
+        List<Booking> list = new ArrayList<>();
+        for (Booking b : p.getBookings()) {
+            if (b.getStatus() == Booking.BookingStatus.ACTIVE) {
+                list.add(b);
+            }
+        }
+
+        for (Booking b : list) {
+            Student s = b.getStudent();
+            boolean ok = this.paymentSystem.processRefund(b.getNumTickets(),
+                p.getEventTitle(), s.getEmail(), s.getPhoneNumber(),
+                ep.getEmail(), b.getAmountPaid(), msg);
+            if (!ok) {
+                this.view.displayError("There was an issue with a refund. The performance cannot be cancelled.");
+                return;
+            }
+        }
+
+        for (Booking b : list) {
+            b.cancelByProvider();
+        }
+        p.cancel();
+        this.view.displaySuccess("Cancellation Successful!");
+    }
+
+    private Event getEvtByID(long evtId) {
+        for (Event e : this.events) {
+            if (evtId == e.getEventID()) {
                 return e;
             }
         }
@@ -270,7 +352,7 @@ public class EventPerformanceController extends Controller{
     }
 
     private Event getEventByTitle(String title) {
-        for (Event e : events) {
+        for (Event e : this.events) {
             if (title.equals(e.getTitle())) {
                 return e;
             }
@@ -279,7 +361,7 @@ public class EventPerformanceController extends Controller{
     }
 
     private Performance getPerformanceByID(long performanceID) {
-        for (Event e : events) {
+        for (Event e : this.events) {
             List<Performance> performances = e.getPerformances();
             for (Performance p : performances) {
                 if (performanceID == p.getPerformanceID()) {
@@ -288,5 +370,15 @@ public class EventPerformanceController extends Controller{
             }
         }
         return null;
+    }
+
+    private long readLong(String prompt) {
+        while (true) {
+            try {
+                return Long.parseLong(this.view.getInput(prompt));
+            } catch (NumberFormatException e) {
+                this.view.displayError("Invalid number try again");
+            }
+        }
     }
 }

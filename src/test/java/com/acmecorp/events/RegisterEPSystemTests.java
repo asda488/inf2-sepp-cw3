@@ -97,7 +97,7 @@ public class RegisterEPSystemTests extends SystemTestsBase{
     @FieldSource("INVALID_EXISTING_EP_CREDENTIALS")
     void registerExistingEPFail(String email, String orgName, String businessNumber,
         String duplicateEmail, String duplicateOrgName, String duplicateBusinessNumber, String duplicateType){
-        attemptRegisterEPAndExit(email, "", businessNumber, "", "", orgName);
+        attemptRegisterEPAndExit(email, "a", businessNumber, "b", "c", orgName);
         attemptRegisterEPAndExit(duplicateEmail, "", duplicateBusinessNumber, "", "", duplicateOrgName);
         verify(this.textUserInterfaceMock, times(1)
             .description(String.format("EP registration was successful even though duplicate %s was provided.", duplicateType)))
