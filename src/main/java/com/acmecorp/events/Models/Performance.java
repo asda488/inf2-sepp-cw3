@@ -3,8 +3,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import com.acmecorp.events.Services.MockPaymentSystem.Booking;
-
 public class Performance {
     private long performanceID;
     private LocalDateTime startDateTime;
@@ -25,7 +23,7 @@ public class Performance {
     private Event event;
     private Collection<Booking> bookings;
     
-    enum PerformanceStatus {
+    public static enum PerformanceStatus {
         ACTIVE,
         CANCELLED
     }
@@ -153,7 +151,8 @@ public class Performance {
         return sponsoredAmount;
     }
 
-    public void setSponsoredAmount(double sponsoredAmount) {
+    public void sponsor(double sponsoredAmount) { //custom setter for sponsored amount
+        this.isSponsored = (sponsoredAmount != 0);
         this.sponsoredAmount = sponsoredAmount;
     }
 
@@ -189,6 +188,10 @@ public class Performance {
         return bookings;
     }
 
+    public void addBooking(Booking b){ //custom setter for bookings
+        this.bookings.add(b);
+    }
+
     public void cancel() {
         this.status = PerformanceStatus.CANCELLED;
     }
@@ -203,7 +206,7 @@ public class Performance {
 
     public double getFinalTicketPrice() {
         if (isSponsored) {
-            return ticketPrice - Math.floor(sponsoredAmount/(numTicketsTotal-numTicketsSold)*100)/100;
+            return ticketPrice - sponsoredAmount;
         } else {
             return ticketPrice;
         }
@@ -219,8 +222,30 @@ public class Performance {
     }
 
     public boolean checkHasNotHappenedYet() {
-        return this.endDateTime.isAfter(LocalDateTime.now());
+        return this.startDateTime.isAfter(LocalDateTime.now());
     }
+
+    /**
+     * Check if the performance has any active bookings at all
+     * Returns true if any active, false otherwise
+     */
+    public boolean hasActiveBookings(){
+        for (Booking b : this.bookings){
+            if (b.getStatus() == Booking.BookingStatus.ACTIVE){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Check whether this performance is owned by some EP
+     * @param email Email of the EP to check
+     */
+    public boolean checkCreatedByEP(String email){
+        return this.event.getOrganiserEmail().equals(email);
+    }
+
 
     public String toString() {
         return ("Event = " + event.getTitle() + 

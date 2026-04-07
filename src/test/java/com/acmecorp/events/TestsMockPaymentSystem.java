@@ -13,7 +13,7 @@ import org.junit.jupiter.params.provider.FieldSource;
 
 import com.acmecorp.events.Services.MockPaymentSystem;
 
-public class TestMockPaymentSystem {
+public class TestsMockPaymentSystem {
 
     static List<Arguments> VALID_PAYMENTS = Arrays.asList(
         arguments(1, "Fringe Event 2", "john@hindeburgh.ac.uk",

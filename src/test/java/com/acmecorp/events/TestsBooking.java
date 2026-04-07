@@ -29,6 +29,7 @@ public class TestsBooking {
         "james@hindeburgh.ac.uk", "07403937357")
     );
 
+    /** Check student can cancel booking */
     @ParameterizedTest
     @FieldSource("EXAMPLE_BOOKINGS")
     void cancelByStudentTest(Booking booking){
@@ -37,6 +38,7 @@ public class TestsBooking {
         "Booking could not be cancelled by student.");
     }
 
+    /** Check payment failure can cancel booking */
     @ParameterizedTest
     @FieldSource("EXAMPLE_BOOKINGS")
     void cancelPaymentFailedTest(Booking booking){
@@ -45,6 +47,7 @@ public class TestsBooking {
         "Booking could not be cancelled on payment failure.");
     }
 
+    /** Check EP can cancel booking */
     @ParameterizedTest
     @FieldSource("EXAMPLE_BOOKINGS")
     void cancelByProviderTest(Booking booking){
@@ -53,6 +56,7 @@ public class TestsBooking {
         "Booking could not be cancelled by provider/EP.");
     }
 
+    /** Check student can find booking with valid email */
     @ParameterizedTest
     @FieldSource("EXAMPLE_BOOKINGS")
     void checkBookedByStudentTrueTest(Booking booking, String email){
@@ -60,6 +64,7 @@ public class TestsBooking {
         String.format("Booking could not be attributed to %s even though it was booked with it.", email));
     }
 
+    /** Check using a wrong email to find a booking will fail */
     @ParameterizedTest
     @FieldSource("EXAMPLE_BOOKINGS")
     void checkBookedByStudentFalseTest(Booking booking){
@@ -67,6 +72,7 @@ public class TestsBooking {
         "Booking was attributed to different email even though it was not booked with it");
     }
 
+    /** Check student details contain correct information */
     @ParameterizedTest
     @FieldSource("EXAMPLE_BOOKINGS")
     void getStudentDetailsCorrectDetailsTest(Booking booking, String email, String phoneNumber){
@@ -80,18 +86,18 @@ public class TestsBooking {
         );
     }
 
+    /** Check booking record contains correct information*/
     @ParameterizedTest
     @FieldSource("EXAMPLE_BOOKINGS")
     void generateBookingRecordTest(Booking booking, String email, String phoneNumber){
-        String studentDetails = booking.generateBookingRecord();
+        String bookingRecord = booking.generateBookingRecord();
         assertAll(
-            "Assertions for getStudentDetails:",
-            () -> assertTrue(studentDetails.contains(email), 
-                "Returned student details do not contain email."),
-            () -> assertTrue(studentDetails.contains(phoneNumber), 
-                "Returned student details do not contain phone number.")
+            "Assertions for generateBookingRecord:",
+            () -> assertTrue(bookingRecord.contains(email), 
+                "Booking record does not contain email."),
+            () -> assertTrue(bookingRecord.contains(phoneNumber), 
+                "Booking record does not contain phone number.")
         );
     }
 
-    //TODO: mockito test generateBookingRecord
 }
