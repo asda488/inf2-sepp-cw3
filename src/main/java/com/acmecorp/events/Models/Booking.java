@@ -11,12 +11,13 @@ public class Booking {
         PAYMENT_FAILED
     }
 
-    private long bookingNumber;
-    private int numTickets;
-    private double amountPaid;
-    private LocalDateTime bookingDate;
+    private long bookNo;
+    private int numTix;
+    private double paid;
+    private LocalDateTime bookDt;
     private BookingStatus status;
-    private Student student;
+    private Student stu;
+    private Performance perf;
 
     /**
      * Model class representing one instance of a booking for
@@ -27,46 +28,52 @@ public class Booking {
      * @param numTickets Number of tickets booked
      * @param student Student booking belongs to
      */
-    public Booking(long bookingNumber, int numTickets, double amountPaid, 
+    public Booking(long bookingNumber, int numTickets, double amountPaid,
         LocalDateTime bookingDate, Student student) {
-        this.amountPaid = amountPaid;
-        this.bookingDate = bookingDate;
-        this.bookingNumber = bookingNumber;
-        this.numTickets = numTickets;
-        this.student = student;
+        this.paid = amountPaid;
+        this.bookDt = bookingDate;
+        this.bookNo = bookingNumber;
+        this.numTix = numTickets;
+        this.stu = student;
         this.status = BookingStatus.ACTIVE;
     }
 
+    public Booking(long bookingNumber, int numTickets, double amountPaid,
+        LocalDateTime bookingDate, Student student, Performance performance) {
+        this(bookingNumber, numTickets, amountPaid, bookingDate, student);
+        this.perf = performance;
+    }
+
     public long getBookingNumber() {
-        return bookingNumber;
+        return bookNo;
     }
 
     public void setBookingNumber(long bookingNumber) {
-        this.bookingNumber = bookingNumber;
+        this.bookNo = bookingNumber;
     }
 
     public int getNumTickets() {
-        return numTickets;
+        return numTix;
     }
 
     public void setNumTickets(int numTickets) {
-        this.numTickets = numTickets;
+        this.numTix = numTickets;
     }
 
     public double getAmountPaid() {
-        return amountPaid;
+        return paid;
     }
 
     public void setAmountPaid(double amountPaid) {
-        this.amountPaid = amountPaid;
+        this.paid = amountPaid;
     }
 
     public LocalDateTime getBookingDate() {
-        return bookingDate;
+        return bookDt;
     }
 
     public void setBookingDate(LocalDateTime bookingDate) {
-        this.bookingDate = bookingDate;
+        this.bookDt = bookingDate;
     }
 
     public BookingStatus getStatus() {
@@ -78,28 +85,53 @@ public class Booking {
     }
 
     public void setStudent(Student student) {
-        this.student = student;
+        this.stu = student;
     }
 
+    public Student getStudent() {
+        return stu;
+    }
+
+    public Performance getPerformance() {
+        return perf;
+    }
+
+    public void setPerformance(Performance performance) {
+        this.perf = performance;
+    }
 
     public void cancelByStudent(){
-
+        this.status = BookingStatus.CANCELLED_BY_USER;
     }
 
     public void cancelPaymentFailed(){
-        
+        this.status = BookingStatus.PAYMENT_FAILED;
     }
 
     public void cancelByProvider(){
-        
+        this.status = BookingStatus.CANCELLED_BY_PROVIDER;
     }
+
     public boolean checkBookedByStudent(String email){
-        return false;
+        return this.stu.getEmail().equalsIgnoreCase(email);
     }
+
     public String getStudentDetails(){
-        return null;
+        return "Student = " + stu.getName()
+            + ", Email = " + stu.getEmail()
+            + ", Phone = " + stu.getPhoneNumber();
     }
+
     public String generateBookingRecord(){
-        return null;
+        String out = "Booking = " + bookNo
+            + ", Tickets = " + numTix
+            + ", Paid = " + paid
+            + ", Date = " + bookDt
+            + ", " + getStudentDetails();
+        if (perf != null) {
+            out += ", Event = " + perf.getEventTitle()
+                + ", PerformanceID = " + perf.getPerformanceID();
+        }
+        return out;
     }
 }

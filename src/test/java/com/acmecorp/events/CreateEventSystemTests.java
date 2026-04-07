@@ -5,6 +5,7 @@ import com.acmecorp.events.Models.EntertainmentProvider;
 import com.acmecorp.events.Models.Event;
 import com.acmecorp.events.Models.Student;
 import com.acmecorp.events.Models.User;
+import com.acmecorp.events.Services.MockPaymentSystem;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.*;
@@ -15,7 +16,7 @@ public class CreateEventSystemTests extends SystemTestsBase {
     @BeforeEach
     void setUpUser() {
         User ep = new EntertainmentProvider("ep@example.com", "password", "123456", "A music promoter", "John Smith", "Acme Events");
-        this.eventPerformanceController = new EventPerformanceController(textUserInterfaceMock, ep);
+        this.eventPerformanceController = new EventPerformanceController(textUserInterfaceMock, ep, new MockPaymentSystem());
     }
 
     @Test
@@ -45,7 +46,7 @@ public class CreateEventSystemTests extends SystemTestsBase {
     @Test
     void shouldRejectNonEntertainmentProviderUser() {
         User student = new Student("student@example.com", "password", "Jane Smith", "07123456789");
-        this.eventPerformanceController = new EventPerformanceController(textUserInterfaceMock, student);
+        this.eventPerformanceController = new EventPerformanceController(textUserInterfaceMock, student, new MockPaymentSystem());
 
         Event event = eventPerformanceController.createEvent();
 

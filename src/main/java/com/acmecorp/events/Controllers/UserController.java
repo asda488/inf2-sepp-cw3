@@ -62,7 +62,6 @@ public class UserController extends Controller{
         } else {
             this.view.displayError("Account not found.");
         }
-        //TODO:change some of these strings to be a bit more informative
     }
 
     /**
@@ -86,7 +85,11 @@ public class UserController extends Controller{
         String orgName = this.view.getInput("Please enter the organisation name of the entertainment provider");
         String businessNumber = this.view.getInput("Please enter the business number of the entertainment provider").toLowerCase();
 
-        //TODO: input validation, email type input validation
+
+        if (email.isBlank() || orgName.isBlank() || businessNumber.isBlank()) {
+            this.view.displayError("Invalid input.");
+            return;
+        }
 
         //if initial information finds an EP, fail, else carry on with registration
         if (this.EPAccountAlreadyExists(email, orgName, businessNumber)){
@@ -97,6 +100,10 @@ public class UserController extends Controller{
             String password = this.view.getInput("Please enter the password for the entertainment provider account");
             String description = this.view.getInput("Please enter a description for the entertainment provider account");
             String name = this.view.getInput("Please enter a name for the entertainment provider account");
+            if (password.isBlank() || description.isBlank() || name.isBlank()) {
+                this.view.displayError("Invalid input.");
+                return;
+            }
             addUser(new EntertainmentProvider(email, password, businessNumber, description, name, orgName));
             this.view.displaySuccess("Entertainment provider successfully registered, please log in.");
         }
@@ -105,7 +112,17 @@ public class UserController extends Controller{
     public void editPreferences(){
         //check we are a student
         assert this.checkCurrentUserIsStudent();
-
+        Student s = (Student) this.currentUser;
+        boolean ok = false;
+        while (!ok) {
+            String raw = this.view.getInput(
+                "Enter preferences as a comma separated list from music theatre dance movie sports");
+            ok = s.getPreferences().updatePreferences(raw);
+            if (!ok) {
+                this.view.displayError("One or more preferences were invalid.");
+            }
+        }
+        this.view.displaySuccess("Preferences successfully updated.");
     }
 
     /**

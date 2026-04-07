@@ -32,7 +32,7 @@ public class MenuController extends Controller {
         SEARCH_FOR_PERFORMANCES,
         VIEW_PERFORMANCE,
         CREATE_EVENT,
-        CANCEL_PERFORMANCE       
+        CANCEL_PERFORMANCE
     }
 
     enum AdminMenuOptions {
@@ -112,6 +112,8 @@ public class MenuController extends Controller {
                             this.userController.logout();
                             this.synchroniseUserFromUserController();
                         }
+                        case EDIT_PREFERENCES -> this.userController.editPreferences();
+                        case BOOK_EVENT -> this.bookingController.bookPerformance();
                     }
                 }
             } else if (this.checkCurrentUserIsEntertainmentProvider()){
@@ -122,6 +124,7 @@ public class MenuController extends Controller {
                             this.userController.logout();
                             this.synchroniseUserFromUserController();
                         }
+                        case CANCEL_PERFORMANCE -> this.eventPerformanceController.cancelPerformance();
                     }
                 }
             } else if (this.checkCurrentUserIsAdmin()){
@@ -145,7 +148,7 @@ public class MenuController extends Controller {
                         case REGISTER_EP -> this.userController.registerEntertainmentProvider();
                     }
                 }
-            } 
+            }
             //if exit was requested, set the run variable to false
             if (selectionIndex == -1){
                 run = false;

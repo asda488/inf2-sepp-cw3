@@ -26,6 +26,15 @@ public class LoginSystemTests extends SystemTestsBase {
         arguments("james@hindeburgh.ac.uk","mypassword")
     );
 
+    static List<Arguments> EP_LOGIN_CREDENTIALS = Arrays.asList(
+        arguments("admin@edinburghtheatre.com", "editheatre", "edi12345",
+            "Edinburgh Theatres and Performing Arts", "Liam Theatremaster", "Edinburgh Theatres"),
+        arguments("circus@londoncircus.com", "f!nest", "lon98765",
+            "London's finest touring circus", "Mr Clown", "London Circus"),
+        arguments("sales@comart.org.uk", "comart57", "sp24680a",
+            "Official Community Art Centre", "Polly K", "Community Art Centre")
+    );
+
     static List<Arguments> INVALID_EMAIL_LOGIN_CREDENTIALS = Arrays.asList(
         arguments("jack@hindeburgh.ac.uk","jacksworld"),
         arguments("jane@gmail.com","abcdef"),
@@ -49,6 +58,25 @@ public class LoginSystemTests extends SystemTestsBase {
         this.menuController.mainMenu(); 
     }
 
+    void attemptRegisterEPLoginAndExit(String email, String password,
+        String businessNumber, String description, String name, String orgName){
+        when(this.textUserInterfaceMock.getInput(Mockito.contains("Menu")))
+            .thenReturn("2", "1", "0");
+        when(this.textUserInterfaceMock.getInput(Mockito.contains("email")))
+            .thenReturn(email, email);
+        when(this.textUserInterfaceMock.getInput(Mockito.contains("password")))
+            .thenReturn(password, password);
+        when(this.textUserInterfaceMock.getInput(Mockito.contains("business number")))
+            .thenReturn(businessNumber);
+        when(this.textUserInterfaceMock.getInput(Mockito.contains("description")))
+            .thenReturn(description);
+        when(this.textUserInterfaceMock.getInput(Mockito.contains("name")))
+            .thenReturn(name);
+        when(this.textUserInterfaceMock.getInput(Mockito.contains("organisation name")))
+            .thenReturn(orgName);
+        this.menuController.mainMenu();
+    }
+
     /** Check students can log in succesfully */
     @ParameterizedTest
     @FieldSource("STUDENT_LOGIN_CREDENTIALS")
@@ -66,6 +94,18 @@ public class LoginSystemTests extends SystemTestsBase {
         attemptLoginAndExit(email, password);
         verify(this.textUserInterfaceMock, times(1)
             .description("Admin login was unsuccessful even though credentials were correct."))
+            .displaySuccess(String.format("Logged in with email %s.", email));
+    }
+
+    /** Check EPs can log in succesfully */
+    @ParameterizedTest
+    @FieldSource("EP_LOGIN_CREDENTIALS")
+    void loginEPSuccess(String email, String password, String businessNumber,
+        String description, String name, String orgName){
+        attemptRegisterEPLoginAndExit(email, password, businessNumber,
+            description, name, orgName);
+        verify(this.textUserInterfaceMock, times(1)
+            .description("EP login was unsuccessful even though credentials were correct."))
             .displaySuccess(String.format("Logged in with email %s.", email));
     }
 
@@ -88,6 +128,4 @@ public class LoginSystemTests extends SystemTestsBase {
             .description("Student login was successful even though password was incorrect."))
             .displayError("Password incorrect.");
     }
-
-    //TODO:expand to EP
 }

@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import com.acmecorp.events.Models.EventType;
 
 public class Event {
     private long eventID;
@@ -16,12 +15,13 @@ public class Event {
     private List<Performance> performances;
     private EntertainmentProvider organiser;
 
-    public Event(long eventID, String title, EventType type, boolean isTicketed, List<Performance> performances, EntertainmentProvider organiser) {
+    public Event(long eventID, String title, EventType type, boolean isTicketed,
+        List<Performance> performances, EntertainmentProvider organiser) {
         this.eventID = eventID;
         this.title = title;
         this.type = type;
         this.isTicketed = isTicketed;
-        this.performances = performances;
+        this.performances = performances == null ? new ArrayList<>() : performances;
         this.organiser = organiser;
     }
 
@@ -115,6 +115,7 @@ public class Event {
         return false;
     }
 
+    @Override
     public String toString() {
         return ("EventID = " + eventID + ", Title = " + title + ", Type = " + type + "Ticketed = " + isTicketed);
     }
