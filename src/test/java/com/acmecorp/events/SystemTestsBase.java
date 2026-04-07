@@ -13,6 +13,7 @@ import com.acmecorp.events.Views.TextUserInterface;
 
 public class SystemTestsBase {
     TextUserInterface textUserInterfaceMock;
+    User currentUserMock;
 
     UserController userController;
     BookingController bookingController;

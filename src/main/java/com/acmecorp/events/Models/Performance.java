@@ -1,7 +1,11 @@
 package com.acmecorp.events.Models;
+import com.acmecorp.events.Services.MockPaymentSystem;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+
+import static java.lang.Math.*;
 
 public class Performance {
     private long performanceID;
@@ -21,16 +25,14 @@ public class Performance {
     private Collection<String> reviewComments;
     private PerformanceStatus status;
     private Event event;
-    private Collection<Booking> bookings;
+    private Collection<MockPaymentSystem.Booking> bookings;
     
-    public static enum PerformanceStatus {
+    enum PerformanceStatus {
         ACTIVE,
         CANCELLED
     }
 
-    public Performance(Event event, long performanceID, LocalDateTime startDateTime, LocalDateTime endDateTime, 
-        Collection<String> performerNames, double ticketPrice, int numTickets, String venueAddress, 
-        int venueCapacity, boolean venueIsOutdoors, boolean venueAllowsSmoking) {
+    public Performance(Event event, long performanceID, LocalDateTime startDateTime, LocalDateTime endDateTime, Collection<String> performerNames, double ticketPrice, int numTickets, String venueAddress, int venueCapacity, boolean venueIsOutdoors, boolean venueAllowsSmoking) {
         this.event = event;
         this.performanceID = performanceID;
         this.startDateTime = startDateTime;
@@ -151,8 +153,7 @@ public class Performance {
         return sponsoredAmount;
     }
 
-    public void sponsor(double sponsoredAmount) { //custom setter for sponsored amount
-        this.isSponsored = (sponsoredAmount != 0);
+    public void setSponsoredAmount(double sponsoredAmount) {
         this.sponsoredAmount = sponsoredAmount;
     }
 
@@ -184,12 +185,8 @@ public class Performance {
         return event;
     }
 
-    public Collection<Booking> getBookings() {
+    public Collection<MockPaymentSystem.Booking> getBookings() {
         return bookings;
-    }
-
-    public void addBooking(Booking b){ //custom setter for bookings
-        this.bookings.add(b);
     }
 
     public void cancel() {
@@ -206,7 +203,7 @@ public class Performance {
 
     public double getFinalTicketPrice() {
         if (isSponsored) {
-            return ticketPrice - sponsoredAmount;
+            return ticketPrice - Math.floor(sponsoredAmount/(numTicketsTotal-numTicketsSold)*100)/100;
         } else {
             return ticketPrice;
         }
@@ -214,7 +211,7 @@ public class Performance {
 
     public String getOrganiserEmail() {
         EntertainmentProvider organiser = event.getOrganiser();
-        return organiser.getEmail();
+        return organiser.getOrgEmail();
     }
 
     public String getEventTitle() {
@@ -222,30 +219,8 @@ public class Performance {
     }
 
     public boolean checkHasNotHappenedYet() {
-        return this.startDateTime.isAfter(LocalDateTime.now());
+        return this.endDateTime.isAfter(LocalDateTime.now());
     }
-
-    /**
-     * Check if the performance has any active bookings at all
-     * Returns true if any active, false otherwise
-     */
-    public boolean hasActiveBookings(){
-        for (Booking b : this.bookings){
-            if (b.getStatus() == Booking.BookingStatus.ACTIVE){
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Check whether this performance is owned by some EP
-     * @param email Email of the EP to check
-     */
-    public boolean checkCreatedByEP(String email){
-        return this.event.getOrganiserEmail().equals(email);
-    }
-
 
     public String toString() {
         return ("Event = " + event.getTitle() + 
